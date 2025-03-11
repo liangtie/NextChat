@@ -115,6 +115,7 @@ export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
 
 export enum ServiceProvider {
+  EDA_CN = "eda-cn",
   OpenAI = "OpenAI",
   Azure = "Azure",
   Google = "Google",
@@ -142,6 +143,7 @@ export enum GoogleSafetySettingsThreshold {
 }
 
 export enum ModelProvider {
+  EDA_CN = "eda-cn",
   Stability = "Stability",
   GPT = "GPT",
   GeminiPro = "GeminiPro",

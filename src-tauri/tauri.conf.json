@@ -54,7 +54,10 @@
       "http": {
         "all": true,
         "request": true,
-        "scope": ["https://*", "http://*"]
+        "scope": [
+          "https://*",
+          "http://*"
+        ]
       }
     },
     "bundle": {
@@ -107,11 +110,9 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
+        "fullscreen": true,
         "resizable": true,
         "title": "NextChat",
-        "width": 960,
         "hiddenTitle": true,
         "titleBarStyle": "Overlay"
       }

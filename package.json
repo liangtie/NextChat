@@ -11,6 +11,8 @@
     "lint": "next lint",
     "export": "yarn mask && cross-env BUILD_MODE=export BUILD_APP=1 next build",
     "export:dev": "concurrently -r \"yarn mask:watch\"  \"cross-env BUILD_MODE=export BUILD_APP=1 next dev\"",
+    "dock": "yarn mask && cross-env BUILD_MODE=export BUILD_APP=1 BUILD_DOCK_WIDGET=1 next build",
+    "dock:dev": "concurrently -r \"yarn mask:watch\"  \"cross-env BUILD_MODE=export BUILD_APP=1 BUILD_DOCK_WIDGET=1 next dev\"",
     "app:dev": "concurrently -r \"yarn mask:watch\" \"yarn tauri dev\"",
     "app:build": "yarn mask && yarn tauri build",
     "app:clear": "yarn tauri dev",

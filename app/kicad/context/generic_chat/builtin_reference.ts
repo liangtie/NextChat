@@ -1,0 +1,5 @@
+export enum BUILTIN_REFERENCE {
+  INVALID,
+  BOM,
+  NET_LIST,
+}

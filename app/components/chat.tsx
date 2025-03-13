@@ -49,7 +49,6 @@ import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import {
-  BOT_HELLO,
   ChatMessage,
   createMessage,
   DEFAULT_TOPIC,
@@ -125,6 +124,11 @@ import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
+import { CONTEXT_MENU_CMD, READABLE_CMD } from "../kicad";
+import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../kicad/constant";
+import { websocketClient } from "../websocket";
+
+let IS_FIRST_LAUNCH = true;
 
 const localStorage = safeLocalStorage();
 
@@ -1334,17 +1338,6 @@ function _Chat() {
     return session.mask.hideContext ? [] : session.mask.context.slice();
   }, [session.mask.context, session.mask.hideContext]);
 
-  if (
-    context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
-  ) {
-    const copiedHello = Object.assign({}, BOT_HELLO);
-    if (!accessStore.isAuthorized()) {
-      copiedHello.content = Locale.Error.Unauthorized;
-    }
-    context.push(copiedHello);
-  }
-
   // preview messages
   const renderMessages = useMemo(() => {
     return context
@@ -1501,12 +1494,52 @@ function _Chat() {
       setUserInput(mayBeUnfinishedInput);
       localStorage.removeItem(key);
     }
-
     const dom = inputRef.current;
+
+    window[WEBVIEW_FUNCTIONS.fire_cmd] = (cmd: CONTEXT_MENU_CMD) => {
+      navigate(Path.Chat);
+
+      const userMessage: ChatMessage = createMessage({
+        role: "user",
+        content: READABLE_CMD[cmd.type],
+        isMcpResponse: false,
+      });
+
+      const botMessage: ChatMessage = createMessage({
+        role: "assistant",
+        streaming: true,
+        model: ASSISTANT_NAME,
+      });
+
+      const session = chatStore.currentSession();
+      chatStore.updateTargetSession(session, (session) => {
+        const savedUserMessage = {
+          ...userMessage,
+        };
+        session.messages = session.messages.concat([
+          savedUserMessage,
+          botMessage,
+        ]);
+      });
+
+      websocketClient.send_cmd(cmd, {
+        onFinish: () => {
+          botMessage.streaming = false;
+          ChatControllerPool.remove(session.id, botMessage.id);
+        },
+        onUpdate: (message: string) => {
+          botMessage.streaming = true;
+          botMessage.content = message;
+          chatStore.updateTargetSession(session, (session) => {
+            session.messages = session.messages.concat();
+          });
+        },
+      });
+    };
+
     return () => {
       localStorage.setItem(key, dom?.value ?? "");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePaste = useCallback(
@@ -2166,6 +2199,12 @@ function _Chat() {
 
 export function Chat() {
   const chatStore = useChatStore();
+
+  if (IS_FIRST_LAUNCH) {
+    chatStore.newSession();
+    IS_FIRST_LAUNCH = false;
+  }
+
   const session = chatStore.currentSession();
   return <_Chat key={session.id}></_Chat>;
 }

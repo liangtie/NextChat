@@ -286,6 +286,7 @@
   flex-direction: column;
   position: relative;
   height: 100%;
+  padding: 8px;
 }
 
 .chat-body {
@@ -555,12 +556,13 @@
 .chat-input-panel {
   position: relative;
   width: 100%;
-  padding: 20px;
-  padding-top: 10px;
   box-sizing: border-box;
   flex-direction: column;
-  border-top: var(--border-in-light);
+  border: var(--border-in-light);
   box-shadow: var(--card-shadow);
+  border-radius: 10px;
+  padding: 5px;
+  background-color: var(--ansiBlack);  
 
   .chat-input-actions {
     .chat-input-action {
@@ -642,17 +644,15 @@
 .chat-input {
   height: 100%;
   width: 100%;
-  border-radius: 10px;
   border: none;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
-  background-color: var(--white);
   color: var(--black);
   font-family: inherit;
-  padding: 10px 90px 10px 14px;
   resize: none;
   outline: none;
   box-sizing: border-box;
   min-height: 68px;
+  background-color: transparent;
 }
 
 .chat-input:focus {

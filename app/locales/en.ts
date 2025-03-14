@@ -86,11 +86,12 @@ const en: LocaleType = {
     Rename: "Rename Chat",
     Typing: "Typing…",
     Input: (submitKey: string) => {
-      var inputHints = `${submitKey} to send`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter to wrap";
-      }
-      return inputHints + ", / to search prompts, : to use commands";
+      // var inputHints = `${submitKey} to send`;
+      // if (submitKey === String(SubmitKey.Enter)) {
+      //   inputHints += ", Shift + Enter to wrap";
+      // }
+      // return inputHints + ", / to search prompts, : to use commands";
+      return "Ask Copilot";
     },
     Send: "Send",
     StartSpeak: "Start Speak",

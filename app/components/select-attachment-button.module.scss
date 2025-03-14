@@ -1,0 +1,26 @@
+.selectAttachmentButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: var(--hover-color);
+  }
+
+  svg {
+    fill: currentColor;
+    width: 16px;
+    height: 16px;
+  }
+
+  .fileInput {
+    display: none;
+  }
+}

@@ -78,6 +78,7 @@ import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
 import Locale from "../locales";
 import styles from "./chat.module.scss";
 import { WelcomePage } from "./welcome-page";
+import { ButtonContainer } from "./button-container";
 
 const localStorage = safeLocalStorage();
 
@@ -1058,6 +1059,28 @@ function _Chat() {
                     fontFamily: config.fontFamily,
                   }}
                 />
+                <ButtonContainer
+                  onFileSelect={(file) => {
+                    if (file) {
+                      setUploading(true);
+                      uploadImageRemote(file)
+                        .then((dataUrl) => {
+                          const images = [...attachImages, dataUrl];
+                          const imagesLength = images.length;
+                          if (imagesLength > 3) {
+                            images.splice(3, imagesLength - 3);
+                          }
+                          setAttachImages(images);
+                        })
+                        .finally(() => setUploading(false));
+                    }
+                  }}
+                  onSend={() => {
+                    if (userInput.trim() || attachImages.length > 0) {
+                      doSubmit(userInput);
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -1099,8 +1122,28 @@ function _Chat() {
   );
 }
 
+let IS_FIRST_LOAD = true;
+
 export function Chat() {
   const chatStore = useChatStore();
+
+  if (IS_FIRST_LOAD) {
+    IS_FIRST_LOAD = false;
+    chatStore.newSession();
+  }
+
   const session = chatStore.currentSession();
+  const navigate = useNavigate();
+
+  window[WEBVIEW_FUNCTIONS.new_session] = () => {
+    chatStore.newSession();
+    navigate(Path.Chat);
+    return chatStore.currentSession().id;
+  };
+
+  window[WEBVIEW_FUNCTIONS.get_current_session_id] = () => {
+    return chatStore.currentSession().id;
+  };
+
   return <_Chat key={session.id}></_Chat>;
 }

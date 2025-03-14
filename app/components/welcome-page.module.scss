@@ -14,11 +14,6 @@
     margin-bottom: 1rem;
     width: 48px;
     height: 48px;
-
-    path {
-      fill: red;
-      stroke: none;
-    }
   }
 
   h1 {
@@ -44,6 +39,16 @@
     div {
       color: var(--black);
       opacity: 0.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      svg {
+        margin-bottom: 0;
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 }

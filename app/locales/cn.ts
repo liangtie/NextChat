@@ -653,8 +653,8 @@ const cn = {
   Welcome: {
     Title: "询问Copilot",
     SubTitle: "Copilot 由 AI 驱动，可能会出现错误。请在使用前仔细检查输出。",
-    Context: "或输入 # 以附加上下文",
-    Extensions: "@ 与扩展对话",
+    Attachment: " 添加附件",
+    Context: "@ 添加上下文",
     Commands: "输入 / 使用命令",
   },
   Mcp: {

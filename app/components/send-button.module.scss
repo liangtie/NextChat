@@ -1,0 +1,24 @@
+.sendButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 11px;
+  opacity: 0.5;
+  color: var(--black);
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  .keybinding {
+    font-size: 10px;
+    opacity: 0.5;
+    font-family: system-ui;
+  }
+}

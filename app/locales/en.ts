@@ -663,8 +663,8 @@ const en: LocaleType = {
     Title: "Ask Copilot",
     SubTitle:
       "Copilot is powered by AI, so mistakes are possible. Review output carefully before use.",
-    Context: "or type # to attach context",
-    Extensions: "@ to chat with extensions",
+    Attachment: "to add attachment",
+    Context: "@ to add context",
     Commands: "Type / to use commands",
   },
   Mcp: {

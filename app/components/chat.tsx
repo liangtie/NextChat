@@ -48,6 +48,7 @@ import { createTTSPlayer } from "../utils/audio";
 import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
 import Locale from "../locales";
 import styles from "./chat.module.scss";
+import { WelcomePage } from "./welcome-page";
 
 
 let IS_FIRST_LAUNCH = true;
@@ -723,12 +724,14 @@ function _Chat() {
   }, [messages, chatStore, navigate, session]);
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
+  const hasMessages = session.messages.length > 0;
 
   return (
     <>
       <div className={styles.chat} key={session.id}>
         <div className={styles["chat-main"]}>
           <div className={styles["chat-body-container"]}>
+          {hasMessages ?(
             <div
               className={styles["chat-body"]}
               ref={scrollRef}
@@ -997,7 +1000,10 @@ function _Chat() {
                     </Fragment>
                   );
                 })}
-            </div>
+            </div>)
+          : (
+            <WelcomePage />
+          )}          
             <div className={styles["chat-input-panel"]}>
               <PromptHints
                 prompts={promptHints}

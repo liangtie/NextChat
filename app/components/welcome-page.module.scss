@@ -1,0 +1,40 @@
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  gap: 1rem;
+
+  svg {
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+  }
+
+  .instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+
+    div {
+      color: #666;
+    }
+  }
+}

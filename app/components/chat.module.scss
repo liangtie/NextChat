@@ -286,15 +286,14 @@
   flex-direction: column;
   position: relative;
   height: 100%;
-  padding: 8px;
 }
 
 .chat-body {
   flex: 1;
   overflow: auto;
   overflow-x: hidden;
-  padding: 20px;
-  padding-bottom: 40px;
+  padding: var(--chat-padding);
+  padding-bottom: 20px;
   position: relative;
   overscroll-behavior: none;
 }
@@ -569,6 +568,10 @@
       margin-bottom: 10px;
     }
   }
+}
+
+.chat-input-panel-container {
+  padding: var(--chat-padding);
 }
 
 @mixin single-line {

@@ -63,6 +63,7 @@
   @include light;
 
   --window-width: 90vw;
+  --chat-padding: 10px;
   --window-height: 90vh;
   --sidebar-width: 300px;
   --window-content-width: calc(100% - var(--sidebar-width));

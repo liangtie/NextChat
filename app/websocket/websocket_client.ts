@@ -66,6 +66,7 @@ class WebSocketStream {
 class WebsocketClient {
   private socket?: WebSocket;
   private stream?: WebSocketStream;
+  private consumed_ctx_ids = new Set<string>();
 
   public constructor(private websocketUrl: string) {}
 
@@ -75,7 +76,17 @@ class WebsocketClient {
       this.socket!.onmessage = (ev) => {
         this.stream?.onmessage(ev);
       };
+
+      if (
+        cmd.design_global_context?.uuid &&
+        this.consumed_ctx_ids.has(cmd.design_global_context.uuid)
+      )
+        cmd.design_global_context = undefined;
+
       this.socket!.send(JSON.stringify(cmd));
+
+      if (cmd.design_global_context?.uuid)
+        this.consumed_ctx_ids.add(cmd.design_global_context.uuid);
     };
 
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
@@ -87,6 +98,7 @@ class WebsocketClient {
   }
 
   private init(onopen?: () => void) {
+    this.consumed_ctx_ids.clear();
     this.socket = new WebSocket(this.websocketUrl);
 
     this.socket.onopen = () => {
@@ -100,6 +112,7 @@ class WebsocketClient {
 
     this.socket.onerror = (ev: Event) => {
       console.log("[Websocket] error", ev);
+      this.consumed_ctx_ids.clear();
     };
     this.socket.onopen = (ev: Event) => {
       console.log("[Websocket] open", ev);

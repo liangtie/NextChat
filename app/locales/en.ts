@@ -659,6 +659,14 @@ const en: LocaleType = {
   Discovery: {
     Name: "Discovery",
   },
+  Welcome: {
+    Title: "Ask Copilot",
+    SubTitle:
+      "Copilot is powered by AI, so mistakes are possible. Review output carefully before use.",
+    Context: "or type # to attach context",
+    Extensions: "@ to chat with extensions",
+    Commands: "Type / to use commands",
+  },
   Mcp: {
     Name: "MCP",
   },

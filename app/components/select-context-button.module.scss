@@ -1,0 +1,25 @@
+.selectContextButton {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  height: 18px;
+  width: 18px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--vscode-editor-foreground) 10%, transparent);
+  outline: none;
+  flex-shrink: 0;
+
+  svg {
+    font-size: 11px;
+    color: var(--vscode-input-placeholderForeground);
+    padding-left: 0;
+    opacity: 1;
+  }
+
+  &:hover {
+    background-color: var(--vscode-editor-selectionBackground);
+  }
+} 

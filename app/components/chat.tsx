@@ -79,6 +79,7 @@ import Locale from "../locales";
 import styles from "./chat.module.scss";
 import { WelcomePage } from "./welcome-page";
 import { ButtonContainer } from "./button-container";
+import { InputBox } from "./input-box";
 
 const localStorage = safeLocalStorage();
 
@@ -1036,52 +1037,41 @@ function _Chat() {
               <WelcomePage />
             )}
             <div className={styles["chat-input-panel-container"]}>
-              <div className={styles["chat-input-panel"]}>
-                <PromptHints
-                  prompts={promptHints}
-                  onPromptSelect={onPromptSelect}
-                />
-                <textarea
-                  id="chat-input"
-                  ref={inputRef}
-                  className={styles["chat-input"]}
-                  placeholder={Locale.Chat.Input(submitKey)}
-                  onInput={(e) => onInput(e.currentTarget.value)}
-                  value={userInput}
-                  onKeyDown={onInputKeyDown}
-                  onFocus={scrollToBottom}
-                  onClick={scrollToBottom}
-                  onPaste={handlePaste}
-                  rows={inputRows}
-                  autoFocus={autoFocus}
-                  style={{
-                    fontSize: config.fontSize,
-                    fontFamily: config.fontFamily,
-                  }}
-                />
-                <ButtonContainer
-                  onFileSelect={(file) => {
-                    if (file) {
-                      setUploading(true);
-                      uploadImageRemote(file)
-                        .then((dataUrl) => {
-                          const images = [...attachImages, dataUrl];
-                          const imagesLength = images.length;
-                          if (imagesLength > 3) {
-                            images.splice(3, imagesLength - 3);
-                          }
-                          setAttachImages(images);
-                        })
-                        .finally(() => setUploading(false));
-                    }
-                  }}
-                  onSend={() => {
-                    if (userInput.trim() || attachImages.length > 0) {
-                      doSubmit(userInput);
-                    }
-                  }}
-                />
-              </div>
+              <InputBox
+                onSend={(text) => {
+                  if (text.trim() === "" && isEmpty(attachImages)) return;
+                  const matchCommand = chatCommands.match(text);
+                  if (matchCommand.matched) {
+                    matchCommand.invoke();
+                    return;
+                  }
+                  setIsLoading(true);
+                  chatStore
+                    .onUserInput(text, attachImages)
+                    .then(() => setIsLoading(false));
+                  setAttachImages([]);
+                  chatStore.setLastInput(text);
+                  if (!isMobileScreen) inputRef.current?.focus();
+                  setAutoScroll(true);
+                }}
+                onFileSelect={(file) => {
+                  if (file) {
+                    setUploading(true);
+                    uploadImageRemote(file)
+                      .then((dataUrl) => {
+                        const images = [...attachImages, dataUrl];
+                        const imagesLength = images.length;
+                        if (imagesLength > 3) {
+                          images.splice(3, imagesLength - 3);
+                        }
+                        setAttachImages(images);
+                      })
+                      .finally(() => setUploading(false));
+                  }
+                }}
+                placeholder={Locale.Chat.Input(submitKey)}
+                disabled={isLoading}
+              />
             </div>
           </div>
           <div

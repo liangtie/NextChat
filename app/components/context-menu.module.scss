@@ -1,0 +1,120 @@
+.contextMenu {
+  width: 240px;
+  background-color: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-commandCenter-inactiveBorder, var(--vscode-widget-border));
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 16px 23px 0px;
+  z-index: 2548;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px;
+  contain: paint;
+}
+
+.searchContainer {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0 6px;
+  border: none;
+  box-sizing: border-box;
+  margin: 2px;
+}
+
+.searchInput {
+  font-size: 11px;
+  line-height: 15px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vscode-input-foreground);
+  padding: 3px 0;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    opacity: 0.5;
+  }
+}
+
+.menuItems {
+  overflow: hidden;
+  height: 200px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--vscode-scrollbarSlider-background);
+    border-radius: 3px;
+  }
+}
+
+.menuItem {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 3px;
+  min-width: 0;
+
+  &:hover {
+    background-color: var(--vscode-list-hoverBackground);
+  }
+
+  .icon {
+    flex-shrink: 0;
+    width: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    color: var(--vscode-foreground);
+    opacity: 0.8;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .itemContent {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+  }
+
+  .name {
+    font-size: 11px;
+    line-height: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .path {
+    font-size: 9px;
+    line-height: 15px;
+    opacity: 0.4;
+    direction: rtl;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 1;
+  }
+
+  .chevron {
+    color: var(--vscode-foreground);
+    opacity: 0.3;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+} 

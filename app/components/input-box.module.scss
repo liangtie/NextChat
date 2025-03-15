@@ -1,0 +1,133 @@
+.full-input-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--vscode-editor-background);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.input-header {
+  padding: 8px 12px;
+  background-color: var(--vscode-editor-background);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attached-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 40px;
+  overflow: hidden;
+}
+
+.file-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background-color: var(--vscode-editor-selectionBackground);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--vscode-editor-foreground);
+
+  .remove-file {
+    background: none;
+    border: none;
+    color: var(--vscode-editor-foreground);
+    cursor: pointer;
+    padding: 0 4px;
+    font-size: 16px;
+    line-height: 1;
+
+    &:hover {
+      color: var(--vscode-textLink-activeForeground);
+    }
+  }
+}
+
+.editor-container {
+  height: 56px;
+  min-height: 56px;
+  max-height: 240px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--vscode-editor-background);
+
+  :global(.monaco-editor) {
+    padding: 8px 12px;
+    background-color: transparent;
+
+    .margin {
+      display: none;
+    }
+
+    .cursor {
+      background-color: var(--primary);
+    }
+
+    .selected-text {
+      background-color: var(--primary);
+      opacity: 0.2;
+    }
+
+    .focused-selected-text {
+      background-color: var(--primary);
+      opacity: 0.3;
+    }
+  }
+}
+
+.input-footer {
+  padding: 8px 12px;
+  background-color: var(--vscode-editor-background);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: var(--gray);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.send-button {
+  background-color: var(--primary);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+  }
+} 

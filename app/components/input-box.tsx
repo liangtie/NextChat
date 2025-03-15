@@ -1,0 +1,222 @@
+import { useRef, useState, useEffect } from "react";
+import * as monaco from "monaco-editor";
+import styles from "./input-box.module.scss";
+import { SendButton } from "./send-button";
+import { SelectAttachmentButton } from "./select-attachment-button";
+import { SelectContextButton } from './select-context-button';
+import { ContextMenu } from './context-menu';
+
+interface InputBoxProps {
+  onSend: (text: string) => void;
+  onFileSelect: (file: File | null) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  onContextSelect?: (context: { name: string; path: string }) => void;
+}
+
+export function InputBox({
+  onSend,
+  onFileSelect,
+  placeholder = "Type a message...",
+  disabled = false,
+  onContextSelect,
+}: InputBoxProps) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number }>();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Handle editor key events
+  const handleKeyDown = (e: monaco.IKeyboardEvent) => {
+    if (e.keyCode === monaco.KeyCode.Escape) {
+      setShowContextMenu(false);
+      return;
+    }
+
+    if (e.keyCode === monaco.KeyCode.Enter && !e.shiftKey) {
+      e.preventDefault();
+      const value = editorInstanceRef.current?.getValue() || "";
+      if (value.trim()) {
+        onSend(value);
+        editorInstanceRef.current?.setValue("");
+      }
+    }
+  };
+
+  // Handle content changes
+  const handleContentChange = () => {
+    const model = editorInstanceRef.current?.getModel();
+    const position = editorInstanceRef.current?.getPosition();
+    
+    if (model && position) {
+      const content = model.getLineContent(position.lineNumber);
+      const lastChar = content[position.column - 2];
+      const currentChar = content[position.column - 1];
+      
+      if (lastChar === "@" && !currentChar) {
+        const coords = editorInstanceRef.current?.getScrolledVisiblePosition(position);
+        if (coords && editorRef.current) {
+          const editorRect = editorRef.current.getBoundingClientRect();
+          const menuWidth = 400; // Approximate menu width
+          const menuHeight = 300; // Approximate menu height
+          
+          // Calculate initial position - place menu slightly below and to the right of cursor
+          let x = editorRect.left + coords.left - 5; // Slightly to the left of cursor
+          let y = editorRect.top + coords.top + 20; // Slightly below cursor
+          
+          // Ensure menu stays within viewport
+          if (x + menuWidth > window.innerWidth) {
+            x = window.innerWidth - menuWidth - 10;
+          }
+          if (y + menuHeight > window.innerHeight) {
+            y = y - menuHeight - 24; // Position above cursor if not enough space below
+          }
+          
+          // Ensure minimum margins
+          x = Math.max(10, x);
+          y = Math.max(10, y);
+          
+          setContextMenuPosition({ x, y });
+          setShowContextMenu(true);
+          setSearchTerm("");
+        }
+      } else {
+        setShowContextMenu(false);
+      }
+    }
+  };
+
+  // Handle mouse events
+  const handleMouseDown = () => {
+    if (showContextMenu) {
+      setShowContextMenu(false);
+    }
+  };
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorInstanceRef.current = monaco.editor.create(editorRef.current, {
+        value: "",
+        language: "plaintext",
+        theme: "vs-dark",
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        wordWrap: "on",
+        fontSize: 14,
+        lineNumbers: "off",
+        renderLineHighlight: "none",
+        scrollbar: {
+          vertical: "hidden",
+          horizontal: "hidden",
+        },
+        padding: { top: 8, bottom: 8 },
+        automaticLayout: true,
+      });
+
+      const editor = editorInstanceRef.current;
+
+      editor.onKeyDown(handleKeyDown);
+      editor.onDidChangeModelContent(handleContentChange);
+      editor.onMouseDown(handleMouseDown);
+
+      return () => {
+        editor.dispose();
+      };
+    }
+  }, [onSend]); // Only depend on onSend since it might change
+
+  const handleFileSelect = (file: File) => {
+    setAttachedFiles([...attachedFiles, file]);
+    onFileSelect(file);
+  };
+
+  const removeFile = (index: number) => {
+    const newFiles = [...attachedFiles];
+    newFiles.splice(index, 1);
+    setAttachedFiles(newFiles);
+  };
+
+  const handleContextSelect = (item: { name: string; path: string }) => {
+    // Add the selected item as a file pill
+    const contextFile = new File([""], item.name, { type: "text/plain" });
+    setAttachedFiles([...attachedFiles, contextFile]);
+    onFileSelect(contextFile);
+
+    // Remove the @ character from the editor if it was triggered by typing
+    const editor = editorInstanceRef.current;
+    if (editor && showContextMenu) {  // showContextMenu indicates it was triggered by typing @
+      const model = editor.getModel();
+      const position = editor.getPosition();
+      
+      if (model && position) {
+        const range = new monaco.Range(
+          position.lineNumber,
+          position.column - 1,  // Remove the @ character
+          position.lineNumber,
+          position.column
+        );
+        
+        editor.executeEdits("", [{
+          range,
+          text: "",  // Replace @ with empty string
+          forceMoveMarkers: true
+        }]);
+      }
+    }
+    setShowContextMenu(false);
+  };
+
+  return (
+    <div className={styles["full-input-box"]}>
+      <div className={styles["input-header"]}>
+        <div className={styles["attached-files"]}>
+          <SelectContextButton onContextSelect={handleContextSelect} />
+          {attachedFiles.map((file, index) => (
+            <div key={index} className={styles["file-pill"]}>
+              <span>{file.name}</span>
+              <button
+                onClick={() => removeFile(index)}
+                className={styles["remove-file"]}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className={styles["editor-container"]} ref={editorRef} />
+      {showContextMenu && contextMenuPosition && (
+        <ContextMenu
+          onSelect={(item) => {
+            if (item.type === "file") {
+              handleContextSelect({ name: item.name, path: item.path || "" });
+            }
+            setShowContextMenu(false);
+          }}
+          onClose={() => setShowContextMenu(false)}
+          position={contextMenuPosition}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          anchorPoint="top"
+          showSearch={false}
+        />
+      )}
+      <div className={styles["input-footer"]}>
+        <div className={styles["action-buttons"]}>
+          <SelectAttachmentButton onFileSelect={handleFileSelect} />
+          <SendButton
+            onClick={() => {
+              const value = editorInstanceRef.current?.getValue() || "";
+              if (value.trim()) {
+                onSend(value);
+                editorInstanceRef.current?.setValue("");
+              }
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

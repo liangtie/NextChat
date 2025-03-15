@@ -56,27 +56,26 @@ export function InputBox({
       const currentChar = content[position.column - 1];
       
       if (lastChar === "@" && !currentChar) {
-        const coords = editorInstanceRef.current?.getScrolledVisiblePosition(position);
+        const atCharPosition = {
+          lineNumber: position.lineNumber,
+          column: position.column - 1 // Position of the @ character
+        };
+        const coords = editorInstanceRef.current?.getScrolledVisiblePosition(atCharPosition);
         if (coords && editorRef.current) {
           const editorRect = editorRef.current.getBoundingClientRect();
           const menuWidth = 400; // Approximate menu width
-          const menuHeight = 300; // Approximate menu height
           
-          // Calculate initial position - place menu slightly below and to the right of cursor
-          let x = editorRect.left + coords.left - 5; // Slightly to the left of cursor
-          let y = editorRect.top + coords.top + 20; // Slightly below cursor
+          // Calculate initial position - align menu's bottom with the @ character
+          let x = editorRect.left + coords.left + 8; // Slightly to the right of @
+          let y = editorRect.top + coords.top; // Align with the @ character
           
           // Ensure menu stays within viewport
           if (x + menuWidth > window.innerWidth) {
             x = window.innerWidth - menuWidth - 10;
           }
-          if (y + menuHeight > window.innerHeight) {
-            y = y - menuHeight - 24; // Position above cursor if not enough space below
-          }
           
           // Ensure minimum margins
           x = Math.max(10, x);
-          y = Math.max(10, y);
           
           setContextMenuPosition({ x, y });
           setShowContextMenu(true);
@@ -199,7 +198,7 @@ export function InputBox({
           position={contextMenuPosition}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          anchorPoint="top"
+          anchorPoint="bottom"
           showSearch={false}
         />
       )}

@@ -153,29 +153,8 @@ function _Chat() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(measure, [userInput]);
 
-  // chat commands shortcuts
-  const chatCommands = useChatCommand({
-    new: () => chatStore.newSession(),
-    newm: () => navigate(Path.NewChat),
-    prev: () => chatStore.nextSession(-1),
-    next: () => chatStore.nextSession(1),
-    clear: () =>
-      chatStore.updateTargetSession(
-        session,
-        (session) => (session.clearContextIndex = session.messages.length),
-      ),
-    fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
-  });
-
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
-    const matchCommand = chatCommands.match(userInput);
-    if (matchCommand.matched) {
-      setUserInput("");
-      matchCommand.invoke();
-      return;
-    }
     setIsLoading(true);
     chatStore
       .onUserInput(userInput, attachImages)
@@ -970,11 +949,6 @@ function _Chat() {
               <InputBox
                 onSend={(text) => {
                   if (text.trim() === "" && isEmpty(attachImages)) return;
-                  const matchCommand = chatCommands.match(text);
-                  if (matchCommand.matched) {
-                    matchCommand.invoke();
-                    return;
-                  }
                   setIsLoading(true);
                   chatStore
                     .onUserInput(text, attachImages)

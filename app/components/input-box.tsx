@@ -3,27 +3,8 @@ import * as monaco from "monaco-editor";
 import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
 import { SelectAttachmentButton } from "./select-attachment-button";
-import { SelectContextButton } from './select-context-button';
-import { ContextMenu } from './context-menu';
-
-// Configure Monaco Editor workers
-self.MonacoEnvironment = {
-  getWorkerUrl: function (moduleId, label) {
-    if (label === 'json') {
-      return '_next/static/monaco-editor/json.worker.js';
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return '_next/static/monaco-editor/css.worker.js';
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return '_next/static/monaco-editor/html.worker.js';
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return '_next/static/monaco-editor/ts.worker.js';
-    }
-    return '_next/static/monaco-editor/editor.worker.js';
-  }
-};
+import { SelectContextButton } from "./select-context-button";
+import { ContextMenu } from "./context-menu";
 
 interface InputBoxProps {
   onSend: (text: string) => void;
@@ -41,10 +22,15 @@ export function InputBox({
   onContextSelect,
 }: InputBoxProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+    null,
+  );
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number }>();
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  }>();
   const [searchTerm, setSearchTerm] = useState("");
 
   // Handle editor key events
@@ -68,34 +54,35 @@ export function InputBox({
   const handleContentChange = () => {
     const model = editorInstanceRef.current?.getModel();
     const position = editorInstanceRef.current?.getPosition();
-    
+
     if (model && position) {
       const content = model.getLineContent(position.lineNumber);
       const lastChar = content[position.column - 2];
       const currentChar = content[position.column - 1];
-      
+
       if (lastChar === "@" && !currentChar) {
         const atCharPosition = {
           lineNumber: position.lineNumber,
-          column: position.column - 1 // Position of the @ character
+          column: position.column - 1, // Position of the @ character
         };
-        const coords = editorInstanceRef.current?.getScrolledVisiblePosition(atCharPosition);
+        const coords =
+          editorInstanceRef.current?.getScrolledVisiblePosition(atCharPosition);
         if (coords && editorRef.current) {
           const editorRect = editorRef.current.getBoundingClientRect();
           const menuWidth = 400; // Approximate menu width
-          
+
           // Calculate initial position - align menu's bottom with the @ character
           let x = editorRect.left + coords.left + 8; // Slightly to the right of @
           let y = editorRect.top + coords.top; // Align with the @ character
-          
+
           // Ensure menu stays within viewport
           if (x + menuWidth > window.innerWidth) {
             x = window.innerWidth - menuWidth - 10;
           }
-          
+
           // Ensure minimum margins
           x = Math.max(10, x);
-          
+
           setContextMenuPosition({ x, y });
           setShowContextMenu(true);
           setSearchTerm("");
@@ -116,7 +103,7 @@ export function InputBox({
   useEffect(() => {
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
     let disposables: monaco.IDisposable[] = [];
-    
+
     if (editorRef.current) {
       try {
         editor = monaco.editor.create(editorRef.current, {
@@ -144,10 +131,10 @@ export function InputBox({
         disposables = [
           editor.onKeyDown(handleKeyDown),
           editor.onDidChangeModelContent(handleContentChange),
-          editor.onMouseDown(handleMouseDown)
+          editor.onMouseDown(handleMouseDown),
         ];
       } catch (error) {
-        console.error('Failed to create editor:', error);
+        console.error("Failed to create editor:", error);
       }
     }
 
@@ -162,31 +149,11 @@ export function InputBox({
             disposable.dispose();
           }
         } catch (error) {
-          console.warn('Failed to dispose handler:', error);
+          console.warn("Failed to dispose handler:", error);
         }
-      }
-
-      // Dispose editor
-      if (editor) {
-        try {
-          const model = editor.getModel();
-          if (model) {
-            model.dispose();
-          }
-          editor.dispose();
-        } catch (error) {
-          console.warn('Failed to dispose editor:', error);
-        }
-      }
-
-      // Clear any remaining Monaco resources
-      try {
-        monaco.editor.getModels().forEach(model => model.dispose());
-      } catch (error) {
-        console.warn('Failed to dispose remaining models:', error);
       }
     };
-  }, [onSend]); // Only depend on onSend since it might change
+  }, [handleKeyDown, handleMouseDown, onSend]); // Only depend on onSend since it might change
 
   const handleFileSelect = (file: File) => {
     setAttachedFiles([...attachedFiles, file]);
@@ -207,23 +174,26 @@ export function InputBox({
 
     // Remove the @ character from the editor if it was triggered by typing
     const editor = editorInstanceRef.current;
-    if (editor && showContextMenu) {  // showContextMenu indicates it was triggered by typing @
+    if (editor && showContextMenu) {
+      // showContextMenu indicates it was triggered by typing @
       const model = editor.getModel();
       const position = editor.getPosition();
-      
+
       if (model && position) {
         const range = new monaco.Range(
           position.lineNumber,
-          position.column - 1,  // Remove the @ character
+          position.column - 1, // Remove the @ character
           position.lineNumber,
-          position.column
+          position.column,
         );
-        
-        editor.executeEdits("", [{
-          range,
-          text: "",  // Replace @ with empty string
-          forceMoveMarkers: true
-        }]);
+
+        editor.executeEdits("", [
+          {
+            range,
+            text: "", // Replace @ with empty string
+            forceMoveMarkers: true,
+          },
+        ]);
       }
     }
     setShowContextMenu(false);

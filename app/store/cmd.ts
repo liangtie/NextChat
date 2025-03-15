@@ -56,7 +56,7 @@ export const SearchService = {
   },
 };
 
-export const usePromptStore = createPersistStore(
+export const useCmdStore = createPersistStore(
   {
     counter: 0,
     cmds: {} as Record<string, APP_CMD>,
@@ -170,7 +170,7 @@ export const usePromptStore = createPersistStore(
           const builtinCMD: Array<CMD_BASE> =
             getLang() === "cn" ? res.cn : res.en;
 
-          const userCMD = usePromptStore.getState().getUserCMDS() ?? [];
+          const userCMD = useCmdStore.getState().getUserCMDS() ?? [];
           SearchService.count.builtin = res.en.length + res.cn.length;
           SearchService.init(builtinCMD, userCMD);
         });

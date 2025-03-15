@@ -71,7 +71,7 @@ import {
   DeepSeek,
   SiliconFlow,
 } from "../constant";
-import { SearchService, usePromptStore } from "../store/cmd";
+import { SearchService, useCmdStore } from "../store/cmd";
 import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
@@ -328,7 +328,7 @@ function SyncConfigModal(props: { onClose?: () => void }) {
 function SyncItems() {
   const syncStore = useSyncStore();
   const chatStore = useChatStore();
-  const promptStore = usePromptStore();
+  const promptStore = useCmdStore();
   const maskStore = useMaskStore();
   const couldSync = useMemo(() => {
     return syncStore.cloudSync();
@@ -480,7 +480,7 @@ export function Settings() {
     [],
   );
 
-  const promptStore = usePromptStore();
+  const promptStore = useCmdStore();
   const builtinCount = SearchService.count.builtin;
   const customCount = promptStore.getUserCMDS().length ?? 0;
   const [shouldShowPromptModal, setShowPromptModal] = useState(false);

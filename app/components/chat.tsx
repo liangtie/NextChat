@@ -52,7 +52,7 @@ import {
   useAccessStore,
   createMessage,
 } from "../store";
-import { usePromptStore } from "../store/cmd";
+import { useCmdStore } from "../store/cmd";
 import { prettyObject } from "../utils/format";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 import { websocketClient } from "../websocket";
@@ -65,6 +65,7 @@ import {
   useScrollToBottom,
   useSubmitHandler,
 } from "./chat-components";
+export { ChatAction };
 import { Avatar } from "./emoji";
 import { ExportMessageModal } from "./exporter";
 import { Markdown } from "./markdown";

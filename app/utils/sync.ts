@@ -5,7 +5,7 @@ import {
   useChatStore,
 } from "../store";
 import { useMaskStore } from "../store/mask";
-import { usePromptStore } from "../store/prompt";
+import { usePromptStore } from "../store/cmd";
 import { StoreKey } from "../constant";
 import { merge } from "./merge";
 
@@ -101,9 +101,9 @@ const MergeStates: StateMerger = {
     return localState;
   },
   [StoreKey.Prompt]: (localState, remoteState) => {
-    localState.prompts = {
-      ...remoteState.prompts,
-      ...localState.prompts,
+    localState.cmds = {
+      ...remoteState.cmds,
+      ...localState.cmds,
     };
     return localState;
   },

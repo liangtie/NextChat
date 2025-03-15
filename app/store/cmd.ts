@@ -4,40 +4,40 @@ import { StoreKey } from "../constant";
 import { getLang } from "../locales";
 import { createPersistStore } from "../utils/store";
 
-export interface PromptBase {
+export interface CMD_BASE {
   id: string;
   title: string;
   priority: number;
 }
 
-export interface SystemPrompt extends PromptBase {}
+export interface SystemCMD extends CMD_BASE {}
 
-export interface UserPrompt extends PromptBase {
+export interface UserCMD extends CMD_BASE {
   content: string;
   isUser: true;
   createdAt: number;
 }
 
-export type Prompt = SystemPrompt | UserPrompt;
+export type APP_CMD = SystemCMD | UserCMD;
 
 export const SearchService = {
   ready: false,
-  builtinEngine: new Fuse<Prompt>([], { keys: ["title"] }),
-  userEngine: new Fuse<Prompt>([], { keys: ["title"] }),
+  builtinEngine: new Fuse<APP_CMD>([], { keys: ["title"] }),
+  userEngine: new Fuse<APP_CMD>([], { keys: ["title"] }),
   count: {
     builtin: 0,
   },
-  allPrompts: [] as Prompt[],
-  builtinPrompts: [] as Prompt[],
+  allCMD: [] as APP_CMD[],
+  builtinCMD: [] as APP_CMD[],
 
-  init(builtinPrompts: Prompt[], userPrompts: Prompt[]) {
+  init(builtinCMD: APP_CMD[], userCMD: APP_CMD[]) {
     if (this.ready) {
       return;
     }
-    this.allPrompts = userPrompts.concat(builtinPrompts);
-    this.builtinPrompts = builtinPrompts.slice();
-    this.builtinEngine.setCollection(builtinPrompts);
-    this.userEngine.setCollection(userPrompts);
+    this.allCMD = userCMD.concat(builtinCMD);
+    this.builtinCMD = builtinCMD.slice();
+    this.builtinEngine.setCollection(builtinCMD);
+    this.userEngine.setCollection(userCMD);
     this.ready = true;
   },
 
@@ -45,7 +45,7 @@ export const SearchService = {
     this.userEngine.remove((doc) => doc.id === id);
   },
 
-  add(prompt: Prompt) {
+  add(prompt: APP_CMD) {
     this.userEngine.add(prompt);
   },
 
@@ -59,36 +59,36 @@ export const SearchService = {
 export const usePromptStore = createPersistStore(
   {
     counter: 0,
-    prompts: {} as Record<string, Prompt>,
+    cmds: {} as Record<string, APP_CMD>,
   },
 
   (set, get) => ({
-    add(prompt: UserPrompt) {
-      const prompts = get().prompts;
-      prompt.id = nanoid();
-      prompt.isUser = true;
-      prompt.createdAt = Date.now();
-      prompts[prompt.id] = prompt;
+    add(cmd: UserCMD) {
+      const prompts = get().cmds;
+      cmd.id = nanoid();
+      cmd.isUser = true;
+      cmd.createdAt = Date.now();
+      prompts[cmd.id] = cmd;
 
       set(() => ({
-        prompts: prompts,
+        cmds: prompts,
       }));
 
-      return prompt.id!;
+      return cmd.id!;
     },
 
     get(id: string) {
-      const targetPrompt = get().prompts[id];
+      const targetPrompt = get().cmds[id];
 
       if (!targetPrompt) {
-        return SearchService.builtinPrompts.find((v) => v.id === id);
+        return SearchService.builtinCMD.find((v) => v.id === id);
       }
 
       return targetPrompt;
     },
 
     remove(id: string) {
-      const prompts = get().prompts;
+      const prompts = get().cmds;
       delete prompts[id];
 
       Object.entries(prompts).some(([key, prompt]) => {
@@ -102,42 +102,42 @@ export const usePromptStore = createPersistStore(
       SearchService.remove(id);
 
       set(() => ({
-        prompts,
+        cmds: prompts,
         counter: get().counter + 1,
       }));
     },
 
-    getUserPrompts() {
-      const userPrompts = Object.values(get().prompts ?? {});
-      userPrompts.sort((a, b) => (b.id && a.id ? b.priority - a.priority : 0));
-      return userPrompts;
+    getUserCMDS() {
+      const userCMD = Object.values(get().cmds ?? {});
+      userCMD.sort((a, b) => (b.id && a.id ? b.priority - a.priority : 0));
+      return userCMD;
     },
 
-    updatePrompt(id: string, updater: (prompt: UserPrompt) => void) {
+    updateCMD(id: string, updater: (prompt: UserCMD) => void) {
       const prompt = {
-        ...(get().prompts[id] ?? {
+        ...(get().cmds[id] ?? {
           title: "",
           content: "",
           id,
         }),
         content: "",
         isUser: true,
-      } as UserPrompt;
+      } as UserCMD;
 
       SearchService.remove(id);
       updater(prompt);
-      const prompts = get().prompts;
+      const prompts = get().cmds;
       prompts[id] = prompt;
-      set(() => ({ prompts }));
+      set(() => ({ cmds: prompts }));
       SearchService.add(prompt);
     },
 
     search(text: string) {
       if (text.length === 0) {
         // return all rompts
-        return this.getUserPrompts().concat(SearchService.builtinPrompts);
+        return this.getUserCMDS().concat(SearchService.builtinCMD);
       }
-      return SearchService.search(text) as Prompt[];
+      return SearchService.search(text) as APP_CMD[];
     },
   }),
   {
@@ -146,7 +146,7 @@ export const usePromptStore = createPersistStore(
 
     migrate(state, version) {
       const newState = JSON.parse(JSON.stringify(state)) as {
-        prompts: Record<string, Prompt>;
+        prompts: Record<string, APP_CMD>;
       };
 
       if (version < 3) {
@@ -162,20 +162,17 @@ export const usePromptStore = createPersistStore(
         return;
       }
 
-      const PROMPT_URL = "./prompts.json";
-
-      type PromptList = Array<PromptBase>;
+      const PROMPT_URL = "./cmds.json";
 
       fetch(PROMPT_URL)
         .then((res) => res.json())
         .then((res) => {
-          let fetchPrompts = [res.en, res.cn];
-          const builtinPrompts: PromptList =
+          const builtinCMD: Array<CMD_BASE> =
             getLang() === "cn" ? res.cn : res.en;
 
-          const userPrompts = usePromptStore.getState().getUserPrompts() ?? [];
+          const userCMD = usePromptStore.getState().getUserCMDS() ?? [];
           SearchService.count.builtin = res.en.length + res.cn.length;
-          SearchService.init(builtinPrompts, userPrompts);
+          SearchService.init(builtinCMD, userCMD);
         });
     },
   },

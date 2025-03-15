@@ -50,7 +50,7 @@ import {
 
 import { ChatControllerPool } from "../client/controller";
 import { DalleQuality, DalleStyle, ModelSize } from "../typing";
-import { Prompt } from "../store/prompt";
+import { APP_CMD } from "../store/cmd";
 import Locale from "../locales";
 
 import { IconButton } from "./button";
@@ -216,77 +216,6 @@ export function useSubmitHandler() {
     shouldSubmit,
   };
 }
-
-export type RenderPrompt = Pick<Prompt, "title">;
-export function PromptHints(props: {
-  prompts: RenderPrompt[];
-  onPromptSelect: (prompt: RenderPrompt) => void;
-}) {
-  const noPrompts = props.prompts.length === 0;
-  const [selectIndex, setSelectIndex] = useState(0);
-  const selectedRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setSelectIndex(0);
-  }, [props.prompts.length]);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (noPrompts || e.metaKey || e.altKey || e.ctrlKey) {
-        return;
-      }
-      // arrow up / down to select prompt
-      const changeIndex = (delta: number) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const nextIndex = Math.max(
-          0,
-          Math.min(props.prompts.length - 1, selectIndex + delta),
-        );
-        setSelectIndex(nextIndex);
-        selectedRef.current?.scrollIntoView({
-          block: "center",
-        });
-      };
-
-      if (e.key === "ArrowUp") {
-        changeIndex(1);
-      } else if (e.key === "ArrowDown") {
-        changeIndex(-1);
-      } else if (e.key === "Enter") {
-        const selectedPrompt = props.prompts.at(selectIndex);
-        if (selectedPrompt) {
-          props.onPromptSelect(selectedPrompt);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.prompts.length, selectIndex]);
-
-  if (noPrompts) return null;
-  return (
-    <div className={styles["prompt-hints"]}>
-      {props.prompts.map((prompt, i) => (
-        <div
-          ref={i === selectIndex ? selectedRef : null}
-          className={clsx(styles["prompt-hint"], {
-            [styles["prompt-hint-selected"]]: i === selectIndex,
-          })}
-          key={prompt.title + i.toString()}
-          onClick={() => props.onPromptSelect(prompt)}
-          onMouseEnter={() => setSelectIndex(i)}
-        >
-          <div className={styles["hint-title"]}>{prompt.title}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function ClearContextDivider() {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();

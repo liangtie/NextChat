@@ -71,7 +71,7 @@ import {
   DeepSeek,
   SiliconFlow,
 } from "../constant";
-import { SearchService, usePromptStore } from "../store/prompt";
+import { SearchService, usePromptStore } from "../store/cmd";
 import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
@@ -343,10 +343,10 @@ function SyncItems() {
     return {
       chat: sessions.length,
       message: messageCount,
-      prompt: Object.keys(promptStore.prompts).length,
+      prompt: Object.keys(promptStore.cmds).length,
       mask: Object.keys(maskStore.masks).length,
     };
-  }, [chatStore.sessions, maskStore.masks, promptStore.prompts]);
+  }, [chatStore.sessions, maskStore.masks, promptStore.cmds]);
 
   return (
     <>
@@ -482,7 +482,7 @@ export function Settings() {
 
   const promptStore = usePromptStore();
   const builtinCount = SearchService.count.builtin;
-  const customCount = promptStore.getUserPrompts().length ?? 0;
+  const customCount = promptStore.getUserCMDS().length ?? 0;
   const [shouldShowPromptModal, setShowPromptModal] = useState(false);
 
   const showUsage = accessStore.isAuthorized();

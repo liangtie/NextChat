@@ -6,6 +6,25 @@ import { SelectAttachmentButton } from "./select-attachment-button";
 import { SelectContextButton } from './select-context-button';
 import { ContextMenu } from './context-menu';
 
+// Configure Monaco Editor workers
+self.MonacoEnvironment = {
+  getWorkerUrl: function (moduleId, label) {
+    if (label === 'json') {
+      return '_next/static/monaco-editor/json.worker.js';
+    }
+    if (label === 'css' || label === 'scss' || label === 'less') {
+      return '_next/static/monaco-editor/css.worker.js';
+    }
+    if (label === 'html' || label === 'handlebars' || label === 'razor') {
+      return '_next/static/monaco-editor/html.worker.js';
+    }
+    if (label === 'typescript' || label === 'javascript') {
+      return '_next/static/monaco-editor/ts.worker.js';
+    }
+    return '_next/static/monaco-editor/editor.worker.js';
+  }
+};
+
 interface InputBoxProps {
   onSend: (text: string) => void;
   onFileSelect: (file: File | null) => void;
@@ -95,35 +114,78 @@ export function InputBox({
   };
 
   useEffect(() => {
+    let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+    let disposables: monaco.IDisposable[] = [];
+    
     if (editorRef.current) {
-      editorInstanceRef.current = monaco.editor.create(editorRef.current, {
-        value: "",
-        language: "plaintext",
-        theme: "vs-dark",
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-        wordWrap: "on",
-        fontSize: 14,
-        lineNumbers: "off",
-        renderLineHighlight: "none",
-        scrollbar: {
-          vertical: "hidden",
-          horizontal: "hidden",
-        },
-        padding: { top: 8, bottom: 8 },
-        automaticLayout: true,
-      });
+      try {
+        editor = monaco.editor.create(editorRef.current, {
+          value: "",
+          language: "plaintext",
+          theme: "vs-dark",
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          wordWrap: "on",
+          fontSize: 14,
+          lineNumbers: "off",
+          renderLineHighlight: "none",
+          scrollbar: {
+            vertical: "hidden",
+            horizontal: "hidden",
+          },
+          padding: { top: 8, bottom: 8 },
+          automaticLayout: true,
+          contextmenu: false, // Disable default context menu
+        });
 
-      const editor = editorInstanceRef.current;
+        editorInstanceRef.current = editor;
 
-      editor.onKeyDown(handleKeyDown);
-      editor.onDidChangeModelContent(handleContentChange);
-      editor.onMouseDown(handleMouseDown);
-
-      return () => {
-        editor.dispose();
-      };
+        // Store disposables for cleanup
+        disposables = [
+          editor.onKeyDown(handleKeyDown),
+          editor.onDidChangeModelContent(handleContentChange),
+          editor.onMouseDown(handleMouseDown)
+        ];
+      } catch (error) {
+        console.error('Failed to create editor:', error);
+      }
     }
+
+    return () => {
+      // First set the ref to null to prevent any new operations
+      editorInstanceRef.current = null;
+
+      // Clean up event handlers
+      for (const disposable of disposables) {
+        try {
+          if (disposable) {
+            disposable.dispose();
+          }
+        } catch (error) {
+          console.warn('Failed to dispose handler:', error);
+        }
+      }
+
+      // Dispose editor
+      if (editor) {
+        try {
+          const model = editor.getModel();
+          if (model) {
+            model.dispose();
+          }
+          editor.dispose();
+        } catch (error) {
+          console.warn('Failed to dispose editor:', error);
+        }
+      }
+
+      // Clear any remaining Monaco resources
+      try {
+        monaco.editor.getModels().forEach(model => model.dispose());
+      } catch (error) {
+        console.warn('Failed to dispose remaining models:', error);
+      }
+    };
   }, [onSend]); // Only depend on onSend since it might change
 
   const handleFileSelect = (file: File) => {

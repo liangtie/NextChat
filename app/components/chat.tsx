@@ -52,15 +52,13 @@ import {
   useAccessStore,
   createMessage,
 } from "../store";
-import { usePromptStore } from "../store/prompt";
+import { usePromptStore } from "../store/cmd";
 import { prettyObject } from "../utils/format";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 import { websocketClient } from "../websocket";
 import { IconButton } from "./button";
 import {
-  RenderPrompt,
   ChatAction,
-  PromptHints,
   EditMessageModal,
   ShortcutKeyModal,
   ClearContextDivider,
@@ -131,19 +129,7 @@ function _Chat() {
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
   const [attachImages, setAttachImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
-
-  // prompt hints
-  const promptStore = usePromptStore();
-  const [promptHints, setPromptHints] = useState<RenderPrompt[]>([]);
-  const onSearch = useDebouncedCallback(
-    (text: string) => {
-      const matchedPrompts = promptStore.search(text);
-      setPromptHints(matchedPrompts);
-    },
-    100,
-    { leading: true, trailing: true },
-  );
+  const [, setUploading] = useState(false);
 
   // auto grow input
   const [inputRows, setInputRows] = useState(2);
@@ -181,32 +167,11 @@ function _Chat() {
     del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
   });
 
-  // only search prompts when user input is short
-  const SEARCH_TEXT_LIMIT = 30;
-  const onInput = (text: string) => {
-    setUserInput(text);
-    const n = text.trim().length;
-
-    // clear search results
-    if (n === 0) {
-      setPromptHints([]);
-    } else if (text.match(ChatCommandPrefix)) {
-      setPromptHints(chatCommands.search(text));
-    } else if (!config.disablePromptHint && n < SEARCH_TEXT_LIMIT) {
-      // check if need to trigger auto completion
-      if (text.startsWith("/")) {
-        let searchText = text.slice(1);
-        onSearch(searchText);
-      }
-    }
-  };
-
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
-      setPromptHints([]);
       matchCommand.invoke();
       return;
     }
@@ -217,26 +182,8 @@ function _Chat() {
     setAttachImages([]);
     chatStore.setLastInput(userInput);
     setUserInput("");
-    setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
-  };
-
-  const onPromptSelect = (prompt: RenderPrompt) => {
-    setTimeout(() => {
-      setPromptHints([]);
-
-      const matchedChatCommand = chatCommands.match(prompt.title);
-      if (matchedChatCommand.matched) {
-        // if user is selecting a chat command, just trigger it
-        matchedChatCommand.invoke();
-        setUserInput("");
-      } else {
-        // or fill the prompt
-        setUserInput(prompt.title);
-      }
-      inputRef.current?.focus();
-    }, 30);
   };
 
   // stop response
@@ -272,24 +219,6 @@ function _Chat() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
-
-  // check if should send message
-  const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // if ArrowUp and no userInput, fill with last input
-    if (
-      e.key === "ArrowUp" &&
-      userInput.length <= 0 &&
-      !(e.metaKey || e.altKey || e.ctrlKey)
-    ) {
-      setUserInput(chatStore.lastInput ?? "");
-      e.preventDefault();
-      return;
-    }
-    if (shouldSubmit(e) && promptHints.length === 0) {
-      doSubmit(userInput);
-      e.preventDefault();
-    }
-  };
 
   const deleteMessage = (msgId?: string) => {
     chatStore.updateTargetSession(

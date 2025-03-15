@@ -105,55 +105,57 @@ export function InputBox({
     let disposables: monaco.IDisposable[] = [];
 
     if (editorRef.current) {
-      try {
-        editor = monaco.editor.create(editorRef.current, {
-          value: "",
-          language: "plaintext",
-          theme: "vs-dark",
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          wordWrap: "on",
-          fontSize: 14,
-          lineNumbers: "off",
-          renderLineHighlight: "none",
-          scrollbar: {
-            vertical: "hidden",
-            horizontal: "hidden",
-          },
-          padding: { top: 8, bottom: 8 },
-          automaticLayout: true,
-          contextmenu: false, // Disable default context menu
-        });
+      editor = monaco.editor.create(editorRef.current, {
+        value: "",
+        language: "plaintext",
+        theme: "vs-dark",
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        wordWrap: "on",
+        fontSize: 14,
+        lineNumbers: "off",
+        renderLineHighlight: "none",
+        scrollbar: {
+          vertical: "hidden",
+          horizontal: "hidden",
+        },
+        padding: { top: 8, bottom: 8 },
+        automaticLayout: true,
+      });
 
-        editorInstanceRef.current = editor;
+      editorInstanceRef.current = editor;
 
-        // Store disposables for cleanup
-        disposables = [
-          editor.onKeyDown(handleKeyDown),
-          editor.onDidChangeModelContent(handleContentChange),
-          editor.onMouseDown(handleMouseDown),
-        ];
-      } catch (error) {
-        console.error("Failed to create editor:", error);
-      }
+      // Store disposables for cleanup
+      disposables = [
+        editor.onKeyDown(handleKeyDown),
+        editor.onDidChangeModelContent(handleContentChange),
+        editor.onMouseDown(handleMouseDown),
+      ];
     }
 
     return () => {
-      // First set the ref to null to prevent any new operations
+      // Set the ref to null to prevent new operations
       editorInstanceRef.current = null;
 
       // Clean up event handlers
-      for (const disposable of disposables) {
+      disposables.forEach((d) => {
         try {
-          if (disposable) {
-            disposable.dispose();
-          }
+          d.dispose();
         } catch (error) {
           console.warn("Failed to dispose handler:", error);
         }
+      });
+
+      // Dispose the editor instance
+      if (editor) {
+        try {
+          editor.dispose();
+        } catch (error) {
+          console.warn("Failed to dispose editor:", error);
+        }
       }
     };
-  }, [handleKeyDown, handleMouseDown, onSend]); // Only depend on onSend since it might change
+  }, [onSend]); // Only depend on onSend since it might change
 
   const handleFileSelect = (file: File) => {
     setAttachedFiles([...attachedFiles, file]);

@@ -225,14 +225,14 @@ function _Chat() {
     setTimeout(() => {
       setPromptHints([]);
 
-      const matchedChatCommand = chatCommands.match(prompt.content);
+      const matchedChatCommand = chatCommands.match(prompt.title);
       if (matchedChatCommand.matched) {
         // if user is selecting a chat command, just trigger it
         matchedChatCommand.invoke();
         setUserInput("");
       } else {
         // or fill the prompt
-        setUserInput(prompt.content);
+        setUserInput(prompt.title);
       }
       inputRef.current?.focus();
     }, 30);

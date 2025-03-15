@@ -65,10 +65,7 @@ import {
   showToast,
 } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
-import {
-  Path,
-  ServiceProvider,
-} from "../constant";
+import { Path, ServiceProvider } from "../constant";
 import { ContextPrompts, MaskConfig } from "./mask";
 import { useMaskStore } from "../store/mask";
 import { useAllModels } from "../utils/hooks";
@@ -76,7 +73,6 @@ import { useAllModels } from "../utils/hooks";
 import { getModelProvider } from "../utils/model";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-
 
 export const MCPAction = () => {
   const navigate = useNavigate();
@@ -174,7 +170,6 @@ export function SessionConfigModel(props: { onClose: () => void }) {
   );
 }
 
-
 export function useSubmitHandler() {
   const config = useAppConfig();
   const submitKey = config.submitKey;
@@ -222,8 +217,7 @@ export function useSubmitHandler() {
   };
 }
 
-export type RenderPrompt = Pick<Prompt, "title" | "content">;
-
+export type RenderPrompt = Pick<Prompt, "title">;
 export function PromptHints(props: {
   prompts: RenderPrompt[];
   onPromptSelect: (prompt: RenderPrompt) => void;
@@ -287,7 +281,6 @@ export function PromptHints(props: {
           onMouseEnter={() => setSelectIndex(i)}
         >
           <div className={styles["hint-title"]}>{prompt.title}</div>
-          <div className={styles["hint-content"]}>{prompt.content}</div>
         </div>
       ))}
     </div>

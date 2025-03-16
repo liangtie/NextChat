@@ -114,11 +114,46 @@ export function InputBox({
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
     let disposables: monaco.IDisposable[] = [];
 
+    // Define the dark theme
+    monaco.editor.defineTheme("transparentDarkTheme", {
+      base: "vs-dark",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.background": "#00000000", // Transparent background
+        "editor.lineHighlightBackground": "#00000000", // Transparent line highlight
+        "editorLineNumber.foreground": "#00000000", // Hide line numbers
+        "editorCursor.foreground": "#FFFFFF", // Cursor color
+        "editor.selectionBackground": "#264f7840", // Transparent selection
+        "editor.inactiveSelectionBackground": "#264f7820", // Transparent inactive selection
+        "editorWidget.background": "#00000000", // Transparent widget background
+        "editorWidget.border": "none", // No widget border
+      },
+    });
+
+    // Define the light theme
+    monaco.editor.defineTheme("transparentLightTheme", {
+      base: "vs",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.background": "#FFFFFF00", // Transparent background
+        "editor.lineHighlightBackground": "#FFFFFF00", // Transparent line highlight
+        "editorLineNumber.foreground": "#FFFFFF00", // Hide line numbers
+        "editorCursor.foreground": "#000000", // Cursor color
+        "editor.foreground": "#000000", // Text color (black)
+        "editor.selectionBackground": "#ADD6FF40", // Transparent selection
+        "editor.inactiveSelectionBackground": "#ADD6FF20", // Transparent inactive selection
+        "editorWidget.background": "#FFFFFF00", // Transparent widget background
+        "editorWidget.border": "none", // No widget border
+      },
+    });
+
     if (editorRef.current) {
       editor = monaco.editor.create(editorRef.current, {
         value: "",
         language: "plaintext",
-        theme: "transparentDarkTheme", // Default to dark theme
+        theme: "vs-dark", // Default to dark theme
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         wordWrap: "on",
@@ -129,43 +164,8 @@ export function InputBox({
           vertical: "hidden",
           horizontal: "hidden",
         },
-        padding: { top: 8, bottom: 8 },
+        padding: { top: 0, bottom: 0 }, // Remove padding
         automaticLayout: true,
-      });
-
-      // Define the dark theme
-      monaco.editor.defineTheme("transparentDarkTheme", {
-        base: "vs-dark",
-        inherit: true,
-        rules: [],
-        colors: {
-          "editor.background": "#00000000", // Transparent background
-          "editor.lineHighlightBackground": "#00000000", // Transparent line highlight
-          "editorLineNumber.foreground": "#00000000", // Hide line numbers
-          "editorCursor.foreground": "#FFFFFF", // Cursor color
-          "editor.selectionBackground": "#264f7840", // Transparent selection
-          "editor.inactiveSelectionBackground": "#264f7820", // Transparent inactive selection
-          "editorWidget.background": "#00000000", // Transparent widget background
-          "editorWidget.border": "none", // No widget border
-        },
-      });
-
-      // Define the light theme
-      monaco.editor.defineTheme("transparentLightTheme", {
-        base: "vs",
-        inherit: true,
-        rules: [],
-        colors: {
-          "editor.background": "#FFFFFF00", // Transparent background
-          "editor.lineHighlightBackground": "#FFFFFF00", // Transparent line highlight
-          "editorLineNumber.foreground": "#FFFFFF00", // Hide line numbers
-          "editorCursor.foreground": "#000000", // Cursor color
-          "editor.foreground": "#000000", // Text color (black)
-          "editor.selectionBackground": "#ADD6FF40", // Transparent selection
-          "editor.inactiveSelectionBackground": "#ADD6FF20", // Transparent inactive selection
-          "editorWidget.background": "#FFFFFF00", // Transparent widget background
-          "editorWidget.border": "none", // No widget border
-        },
       });
 
       // Listen for changes in the system theme

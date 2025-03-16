@@ -58,29 +58,6 @@
   overflow: hidden;
   position: relative;
   background-color: var(--vscode-editor-background);
-
-  :global(.monaco-editor) {
-    padding: 8px 12px;
-    background-color: transparent;
-
-    .margin {
-      display: none;
-    }
-
-    .cursor {
-      background-color: var(--primary);
-    }
-
-    .selected-text {
-      background-color: var(--primary);
-      opacity: 0.2;
-    }
-
-    .focused-selected-text {
-      background-color: var(--primary);
-      opacity: 0.3;
-    }
-  }
 }
 
 .input-footer {

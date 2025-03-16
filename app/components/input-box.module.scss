@@ -56,13 +56,15 @@
   min-height: 56px;
   max-height: 240px;
   overflow: hidden;
+  border: none;
   position: relative;
   background-color: var(--vscode-editor-background);
-
-  .margin-view-overlays {
-    display: none;
-  }
 }
+
+
+
+
+
 
 .input-footer {
   padding: 8px 12px;

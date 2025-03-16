@@ -22,6 +22,7 @@ monaco.editor.defineTheme("transparentDarkTheme", {
     "editorWidget.background": "#00000000", // Transparent widget background
     "editorWidget.border": "none", // No widget border
     "editor.foreground": "#FFFFFF",
+    focusBorder: "#00000000",
   },
 });
 
@@ -39,7 +40,8 @@ monaco.editor.defineTheme("transparentLightTheme", {
     "editor.selectionBackground": "#ADD6FF40", // Transparent selection
     "editor.inactiveSelectionBackground": "#ADD6FF20", // Transparent inactive selection
     "editorWidget.background": "#FFFFFF00", // Transparent widget background
-    "editorWidget.border": "none", // No widget border
+    "editorWidget.border": "none", // No widget border,
+    focusBorder: "#00000000",
   },
 });
 

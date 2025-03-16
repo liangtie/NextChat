@@ -15,7 +15,7 @@ monaco.editor.defineTheme("transparentDarkTheme", {
     "editor.inactiveSelectionBackground": "#264f7820", // Transparent inactive selection
     "editorWidget.background": "#00000000", // Transparent widget background
     "editorWidget.border": "none", // No widget border
-    "editor.foreground": "#FFFFFF",
+    "editor.foreground": "#cccccc",
     focusBorder: "#00000000",
   },
 });
@@ -30,7 +30,7 @@ monaco.editor.defineTheme("transparentLightTheme", {
     "editor.lineHighlightBackground": "#FFFFFF00", // Transparent line highlight
     "editorLineNumber.foreground": "#FFFFFF00", // Hide line numbers
     "editorCursor.foreground": "#000000", // Cursor color
-    "editor.foreground": "#000000", // Text color (black)
+    "editor.foreground": "#232020", // Text color (black)
     "editor.selectionBackground": "#ADD6FF40", // Transparent selection
     "editor.inactiveSelectionBackground": "#ADD6FF20", // Transparent inactive selection
     "editorWidget.background": "#FFFFFF00", // Transparent widget background

@@ -7,6 +7,9 @@ import GitIcon from "../icons/git.svg";
 import TerminalIcon from "../icons/terminal.svg";
 import ErrorIcon from "../icons/error.svg";
 import GlobeIcon from "../icons/globe.svg";
+import BomIcon from "../icons/kicad/bom.svg";
+import NetlistIcon from "../icons/kicad/netlist.svg";
+
 import { ContextMenuOption } from "./context-menu-option";
 
 interface ContextMenuItem {
@@ -41,11 +44,13 @@ const defaultSections: ContextMenuItem[] = [
       {
         id: "bom",
         name: "bom",
+        icon: <BomIcon />,
         type: ContextMenuOption.BOM,
       },
       {
         id: "netlist",
         name: "netlist",
+        icon: <NetlistIcon />,
         type: ContextMenuOption.NETLIST,
       },
     ],

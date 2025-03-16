@@ -50,9 +50,7 @@ export function InputBox({ onSend }: InputBoxProps) {
   };
 
   const [refs, setRefs] = useState(new Set<BUILTIN_REFERENCE>());
-  const [global_ctx, setGlobalCtx] = useState<DESIGN_GLOBAL_CONTEXT | null>(
-    null,
-  );
+  const global_ctx = useRef<DESIGN_GLOBAL_CONTEXT>(null);
 
   const editorRef = useRef<HTMLDivElement>(null);
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -79,8 +77,8 @@ export function InputBox({ onSend }: InputBoxProps) {
             },
           },
         },
-        global_context_uuid: global_ctx?.uuid || undefined,
-        design_global_context: global_ctx ?? undefined,
+        global_context_uuid: global_ctx.current?.uuid || undefined,
+        design_global_context: global_ctx.current ?? undefined,
       });
       editorInstanceRef.current?.setValue("");
     }
@@ -153,7 +151,7 @@ export function InputBox({ onSend }: InputBoxProps) {
     window[WEBVIEW_FUNCTIONS.update_global_ctx] = (
       ctx: DESIGN_GLOBAL_CONTEXT,
     ) => {
-      setGlobalCtx(ctx);
+      (global_ctx.current as DESIGN_GLOBAL_CONTEXT | null) = ctx;
     };
 
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;

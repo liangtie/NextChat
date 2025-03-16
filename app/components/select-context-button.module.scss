@@ -7,7 +7,7 @@
   height: 18px;
   width: 18px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: none;
   border: 1px solid color-mix(in srgb, var(--vscode-editor-foreground) 10%, transparent);
   outline: none;
   flex-shrink: 0;
@@ -22,4 +22,4 @@
   &:hover {
     background-color: var(--vscode-editor-selectionBackground);
   }
-} 
+}

@@ -26,6 +26,24 @@ body>nextjs-portal {
   /* stroke */
   --border-in-light: 1px solid rgb(222, 222, 222);
 
+
+  /* Add missing VS Code theme variables for dark mode */
+  --vscode-dropdown-background: #ffffff;
+  /* Dark dropdown background */
+  --vscode-commandCenter-inactiveBorder: #e3d9d9;
+  /* Dark border color */
+  --vscode-widget-border: #dac8c8;
+  /* Dark widget border */
+  --vscode-input-foreground: #252526;
+  /* Input text color */
+  --vscode-scrollbarSlider-background: #797979;
+  /* Scrollbar slider color */
+  --vscode-list-hoverBackground: #d4d4d4;
+  --vscode-list-foreground: #252526;
+  /* List hover background */
+  --vscode-foreground: #cccccc;
+  /* General foreground color */
+
 }
 
 @mixin dark {
@@ -46,6 +64,24 @@ body>nextjs-portal {
   --border-in-light: 1px solid rgba(255, 255, 255, 0.192);
 
   --theme-color: var(--gray);
+
+  /* Add missing VS Code theme variables for dark mode */
+  --vscode-dropdown-background: #252526;
+  /* Dark dropdown background */
+  --vscode-commandCenter-inactiveBorder: #3c3c3c;
+  /* Dark border color */
+  --vscode-widget-border: #454545;
+  /* Dark widget border */
+  --vscode-input-foreground: #d4d4d4;
+  /* Input text color */
+  --vscode-scrollbarSlider-background: #797979;
+  /* Scrollbar slider color */
+  --vscode-list-hoverBackground: #2a2d2e;
+  /* List hover background */
+  --vscode-foreground: #cccccc;
+  /* General foreground color */
+  --vscode-list-foreground: #cccccc;
+
 
   div:not(.no-dark)>svg {
     filter: invert(0.5);
@@ -74,6 +110,7 @@ body>nextjs-portal {
   --window-content-width: calc(100% - var(--sidebar-width));
   --message-max-width: 80%;
   --full-height: 100%;
+
 }
 
 @media only screen and (max-width: 600px) {

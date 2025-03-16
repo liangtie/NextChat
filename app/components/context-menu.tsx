@@ -1,15 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import styles from "./context-menu.module.scss";
-import FileIcon from "../icons/files.svg";
-import CodeIcon from "../icons/code.svg";
+import CircuitIcon from "../icons/eda/circuit.svg";
+import SymbolIcon from "../icons/eda/symbol.svg";
 import BookIcon from "../icons/book.svg";
 import GitIcon from "../icons/git.svg";
-import NotebookIcon from "../icons/notebook.svg";
-import RulerIcon from "../icons/ruler.svg";
 import TerminalIcon from "../icons/terminal.svg";
 import ErrorIcon from "../icons/error.svg";
 import GlobeIcon from "../icons/globe.svg";
-import GraphIcon from "../icons/graph.svg";
 
 interface ContextMenuItem {
   id: string;
@@ -32,27 +29,65 @@ interface Props {
 }
 
 const defaultSections: ContextMenuItem[] = [
-  { id: "files", name: "Files & Folders", icon: <FileIcon />, type: "section", hasChildren: true },
-  { id: "code", name: "Code", icon: <CodeIcon />, type: "section", hasChildren: true },
-  { id: "docs", name: "Docs", icon: <BookIcon />, type: "section", hasChildren: true },
-  { id: "git", name: "Git", icon: <GitIcon />, type: "section", hasChildren: true },
-  { id: "composers", name: "Summarized Composers", icon: <NotebookIcon />, type: "section", hasChildren: true },
-  { id: "rules", name: "Cursor Rules", icon: <RulerIcon />, type: "section", hasChildren: true },
-  { id: "terminals", name: "Terminals", icon: <TerminalIcon />, type: "section", hasChildren: true },
-  { id: "errors", name: "Linter errors", icon: <ErrorIcon />, type: "section" },
-  { id: "web", name: "Web", icon: <GlobeIcon />, type: "section" },
-  { id: "changes", name: "Recent Changes", icon: <GraphIcon />, type: "section" }
+  {
+    id: "schematic",
+    name: "Schematic",
+    icon: <CircuitIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "symbol",
+    name: "Symbol",
+    icon: <SymbolIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "docs",
+    name: "Docs",
+    icon: <BookIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "git",
+    name: "Git",
+    icon: <GitIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "terminals",
+    name: "Terminals",
+    icon: <TerminalIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "errors",
+    name: "Errors",
+    icon: <ErrorIcon />,
+    type: "section",
+    hasChildren: true,
+  },
+  {
+    id: "web",
+    name: "Web",
+    icon: <GlobeIcon />,
+    type: "section",
+  },
 ];
 
-export function ContextMenu({ 
-  items = [], 
-  onSelect, 
-  onClose, 
-  position, 
-  searchTerm = "", 
+export function ContextMenu({
+  items = [],
+  onSelect,
+  onClose,
+  position,
+  searchTerm = "",
   onSearchChange,
   anchorPoint = "top",
-  showSearch = true
+  showSearch = true,
 }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,21 +111,25 @@ export function ContextMenu({
 
   const allItems = [...items, ...defaultSections];
 
-  const filteredItems = searchTerm && showSearch
-    ? allItems.filter(item => 
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.path?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : allItems;
+  const filteredItems =
+    searchTerm && showSearch
+      ? allItems.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.path?.toLowerCase().includes(searchTerm.toLowerCase()),
+        )
+      : allItems;
 
-  const style = position ? {
-    position: 'fixed' as const,
-    left: `${position.x}px`,
-    top: `${position.y}px`,
-    ...(anchorPoint === "bottom" && {
-      transform: 'translateY(-100%)'
-    })
-  } : {};
+  const style = position
+    ? {
+        position: "fixed" as const,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        ...(anchorPoint === "bottom" && {
+          transform: "translateY(-100%)",
+        }),
+      }
+    : {};
 
   return (
     <div className={styles.contextMenu} ref={menuRef} style={style}>
@@ -115,16 +154,12 @@ export function ContextMenu({
             <span className={styles.icon}>{item.icon}</span>
             <div className={styles.itemContent}>
               <span className={styles.name}>{item.name}</span>
-              {item.path && (
-                <span className={styles.path}>{item.path}</span>
-              )}
+              {item.path && <span className={styles.path}>{item.path}</span>}
             </div>
-            {item.hasChildren && (
-              <span className={styles.chevron}>›</span>
-            )}
+            {item.hasChildren && <span className={styles.chevron}>›</span>}
           </div>
         ))}
       </div>
     </div>
   );
-} 
+}

@@ -45,11 +45,11 @@
   overflow: hidden;
   height: 200px;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background-color: var(--vscode-scrollbarSlider-background);
     border-radius: 3px;
@@ -75,12 +75,11 @@
     display: flex;
     align-items: center;
     justify-content: start;
-    color: var(--vscode-foreground);
-    opacity: 0.8;
 
     svg {
       width: 14px;
       height: 14px;
+      fill: var(--vscode-list-foreground);
     }
   }
 
@@ -117,4 +116,4 @@
     font-size: 12px;
     margin-left: 4px;
   }
-} 
+}

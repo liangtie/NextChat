@@ -100,6 +100,16 @@ export function InputBox({
     }
   };
 
+  // Apply the appropriate theme based on system preference
+  const applyTheme = () => {
+    const isDarkMode = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    monaco.editor.setTheme(
+      isDarkMode ? "transparentDarkTheme" : "transparentLightTheme",
+    );
+  };
+
   useEffect(() => {
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
     let disposables: monaco.IDisposable[] = [];
@@ -108,7 +118,7 @@ export function InputBox({
       editor = monaco.editor.create(editorRef.current, {
         value: "",
         language: "plaintext",
-        theme: "vs-dark",
+        theme: "transparentDarkTheme", // Default to dark theme
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         wordWrap: "on",
@@ -122,6 +132,48 @@ export function InputBox({
         padding: { top: 8, bottom: 8 },
         automaticLayout: true,
       });
+
+      // Define the dark theme
+      monaco.editor.defineTheme("transparentDarkTheme", {
+        base: "vs-dark",
+        inherit: true,
+        rules: [],
+        colors: {
+          "editor.background": "#00000000", // Transparent background
+          "editor.lineHighlightBackground": "#00000000", // Transparent line highlight
+          "editorLineNumber.foreground": "#00000000", // Hide line numbers
+          "editorCursor.foreground": "#FFFFFF", // Cursor color
+          "editor.selectionBackground": "#264f7840", // Transparent selection
+          "editor.inactiveSelectionBackground": "#264f7820", // Transparent inactive selection
+          "editorWidget.background": "#00000000", // Transparent widget background
+          "editorWidget.border": "none", // No widget border
+        },
+      });
+
+      // Define the light theme
+      monaco.editor.defineTheme("transparentLightTheme", {
+        base: "vs",
+        inherit: true,
+        rules: [],
+        colors: {
+          "editor.background": "#FFFFFF00", // Transparent background
+          "editor.lineHighlightBackground": "#FFFFFF00", // Transparent line highlight
+          "editorLineNumber.foreground": "#FFFFFF00", // Hide line numbers
+          "editorCursor.foreground": "#000000", // Cursor color
+          "editor.foreground": "#000000", // Text color (black)
+          "editor.selectionBackground": "#ADD6FF40", // Transparent selection
+          "editor.inactiveSelectionBackground": "#ADD6FF20", // Transparent inactive selection
+          "editorWidget.background": "#FFFFFF00", // Transparent widget background
+          "editorWidget.border": "none", // No widget border
+        },
+      });
+
+      // Listen for changes in the system theme
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      mediaQuery.addEventListener("change", applyTheme);
+
+      // Apply the theme initially
+      applyTheme();
 
       editorInstanceRef.current = editor;
 
@@ -154,6 +206,10 @@ export function InputBox({
           console.warn("Failed to dispose editor:", error);
         }
       }
+
+      // Remove the theme listener
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      mediaQuery.removeEventListener("change", applyTheme);
     };
   }, [onSend]); // Only depend on onSend since it might change
 

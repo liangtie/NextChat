@@ -83,8 +83,6 @@ export function InputBox({ onSend }: InputBoxProps) {
         design_global_context: global_ctx ?? undefined,
       });
       editorInstanceRef.current?.setValue("");
-      setAttachedItems([]);
-      setRefs(new Set());
     }
   };
 

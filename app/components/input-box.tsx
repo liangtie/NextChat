@@ -174,8 +174,15 @@ export function InputBox({
           vertical: "hidden",
           horizontal: "hidden",
         },
+        overviewRulerLanes: 0, // Hide decorations overview ruler
+        glyphMargin: false, // Disable margin view overlays
         padding: { top: 0, bottom: 0 }, // Remove padding
         automaticLayout: true,
+        overviewRulerBorder: false,
+        folding: false,
+        // Undocumented see https://github.com/Microsoft/vscode/issues/30795#issuecomment-410998882
+        lineDecorationsWidth: 0,
+        lineNumbersMinChars: 0,
       });
 
       // Listen for changes in the system theme

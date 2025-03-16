@@ -58,6 +58,10 @@
   overflow: hidden;
   position: relative;
   background-color: var(--vscode-editor-background);
+
+  .margin-view-overlays {
+    display: none;
+  }
 }
 
 .input-footer {

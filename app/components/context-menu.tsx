@@ -9,18 +9,34 @@ import ErrorIcon from "../icons/error.svg";
 import GlobeIcon from "../icons/globe.svg";
 import BomIcon from "../icons/kicad/bom.svg";
 import NetlistIcon from "../icons/kicad/netlist.svg";
+import { BUILTIN_REFERENCE } from "../kicad";
 
-import { ContextMenuOption } from "./context-menu-option";
-
-interface ContextMenuItem {
+export interface ContextMenuItemBase {
   id: string;
   name: string;
   path?: string;
   icon?: React.ReactNode;
-  type: "menu" | "action" | "file" | ContextMenuOption;
   hasChildren?: boolean;
   children?: ContextMenuItem[];
 }
+
+export interface ContextMenuOptItem extends ContextMenuItemBase {
+  type: "option";
+  opt: BUILTIN_REFERENCE;
+}
+
+export interface ContextMenuMenuItem extends ContextMenuItemBase {
+  type: "menu";
+}
+
+export interface ContextMenuActionItem extends ContextMenuItemBase {
+  type: "action";
+}
+
+export type ContextMenuItem =
+  | ContextMenuOptItem
+  | ContextMenuMenuItem
+  | ContextMenuActionItem;
 
 interface Props {
   items?: ContextMenuItem[];
@@ -45,13 +61,15 @@ const defaultSections: ContextMenuItem[] = [
         id: "bom",
         name: "bom",
         icon: <BomIcon />,
-        type: ContextMenuOption.BOM,
+        type: "option",
+        opt: BUILTIN_REFERENCE.BOM,
       },
       {
         id: "netlist",
         name: "netlist",
         icon: <NetlistIcon />,
-        type: ContextMenuOption.NETLIST,
+        type: "option",
+        opt: BUILTIN_REFERENCE.NET_LIST,
       },
     ],
   },

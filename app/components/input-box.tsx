@@ -4,26 +4,32 @@ import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
 import { SelectAttachmentButton } from "./select-attachment-button";
 import { SelectContextButton } from "./select-context-button";
-import { ContextMenu } from "./context-menu";
+import { ContextMenu, ContextMenuItem } from "./context-menu";
 import { useAppConfig } from "../store";
 import "./monaco-theme";
 import { create_editor } from "./monaco-theme";
+import {
+  AttachmentItem,
+  AttachmentType,
+  ContextAttachmentItem,
+} from "./context-attachment";
+import {
+  BUILTIN_REFERENCE,
+  CMD_TYPE,
+  DESIGN_GLOBAL_CONTEXT,
+  GENERIC_CHAT_CMD,
+} from "../kicad";
+import { WEBVIEW_FUNCTIONS } from "../kicad/constant";
+import {
+  fire_kicad_desktop_cmd,
+  KICAD_DESKTOP_CMD_TYPE,
+} from "../kicad/cmd/kicad_desktop";
 
 interface InputBoxProps {
-  onSend: (text: string) => void;
-  onFileSelect: (file: File | null) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  onContextSelect?: (context: { name: string; path: string }) => void;
+  onSend: (text: GENERIC_CHAT_CMD) => void;
 }
 
-export function InputBox({
-  onSend,
-  onFileSelect,
-  placeholder = "Type a message...",
-  disabled = false,
-  onContextSelect,
-}: InputBoxProps) {
+export function InputBox({ onSend }: InputBoxProps) {
   const config = useAppConfig();
   // Apply the appropriate theme based on system preference
   const applyTheme = () => {
@@ -43,17 +49,44 @@ export function InputBox({
     }
   };
 
+  const [refs, setRefs] = useState(new Set<BUILTIN_REFERENCE>());
+  const [global_ctx, setGlobalCtx] = useState<DESIGN_GLOBAL_CONTEXT | null>(
+    null,
+  );
+
   const editorRef = useRef<HTMLDivElement>(null);
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
     null,
   );
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [attachedItems, setAttachedItems] = useState<AttachmentItem[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;
     y: number;
   }>();
   const [searchTerm, setSearchTerm] = useState("");
+
+  const send_chat_cmd = () => {
+    const value = editorInstanceRef.current?.getValue() || "";
+    if (value.trim()) {
+      onSend({
+        type: CMD_TYPE.GENERIC_CHAT,
+        context: {
+          chat: {
+            input_text: value,
+            options: {
+              builtin_refs: [...refs],
+            },
+          },
+        },
+        global_context_uuid: global_ctx?.uuid || undefined,
+        design_global_context: global_ctx ?? undefined,
+      });
+      editorInstanceRef.current?.setValue("");
+      setAttachedItems([]);
+      setRefs(new Set());
+    }
+  };
 
   // Handle editor key events
   const handleKeyDown = (e: monaco.IKeyboardEvent) => {
@@ -64,11 +97,7 @@ export function InputBox({
 
     if (e.keyCode === monaco.KeyCode.Enter && !e.shiftKey) {
       e.preventDefault();
-      const value = editorInstanceRef.current?.getValue() || "";
-      if (value.trim()) {
-        onSend(value);
-        editorInstanceRef.current?.setValue("");
-      }
+      send_chat_cmd();
     }
   };
 
@@ -123,6 +152,12 @@ export function InputBox({
   };
 
   useEffect(() => {
+    window[WEBVIEW_FUNCTIONS.update_global_ctx] = (
+      ctx: DESIGN_GLOBAL_CONTEXT,
+    ) => {
+      setGlobalCtx(ctx);
+    };
+
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
     let disposables: monaco.IDisposable[] = [];
 
@@ -176,21 +211,56 @@ export function InputBox({
   }, [onSend]); // Only depend on onSend since it might change
 
   const handleFileSelect = (file: File) => {
-    setAttachedFiles([...attachedFiles, file]);
-    onFileSelect(file);
+    setAttachedItems([
+      ...attachedItems,
+      {
+        type: AttachmentType.FILE,
+        data: file,
+      },
+    ]);
   };
 
-  const removeFile = (index: number) => {
-    const newFiles = [...attachedFiles];
-    newFiles.splice(index, 1);
-    setAttachedFiles(newFiles);
+  const removeAttachedItem = (index: number) => {
+    const it = attachedItems[index];
+    switch (it.type) {
+      case AttachmentType.FILE:
+        break;
+      case AttachmentType.CONTEXT_OPTION: {
+        const it = attachedItems[index] as ContextAttachmentItem;
+        setRefs(new Set([...refs].filter((r) => r !== it.data.opt)));
+        break;
+      }
+    }
+
+    const newItems = [...attachedItems];
+    newItems.splice(index, 1);
+    setAttachedItems(newItems);
   };
 
-  const handleContextSelect = (item: { name: string; path: string }) => {
-    // Add the selected item as a file pill
-    const contextFile = new File([""], item.name, { type: "text/plain" });
-    setAttachedFiles([...attachedFiles, contextFile]);
-    onFileSelect(contextFile);
+  const handleContextSelect = (item: ContextMenuItem) => {
+    switch (item.type) {
+      case "option": {
+        const it = item.opt;
+        if (!refs.has(it)) {
+          setRefs(new Set([...refs, it]));
+          fire_kicad_desktop_cmd({
+            type: KICAD_DESKTOP_CMD_TYPE.update_global_context,
+          });
+          setAttachedItems([
+            ...attachedItems,
+            {
+              type: AttachmentType.CONTEXT_OPTION,
+              data: {
+                opt: it,
+                name: item.name,
+              },
+              icon: item.icon,
+            },
+          ]);
+        }
+        break;
+      }
+    }
 
     // Remove the @ character from the editor if it was triggered by typing
     const editor = editorInstanceRef.current;
@@ -224,11 +294,11 @@ export function InputBox({
       <div className={styles["input-header"]}>
         <div className={styles["attached-files"]}>
           <SelectContextButton onContextSelect={handleContextSelect} />
-          {attachedFiles.map((file, index) => (
+          {attachedItems.map((item, index) => (
             <div key={index} className={styles["file-pill"]}>
-              <span>{file.name}</span>
+              <span>{item.data.name}</span>
               <button
-                onClick={() => removeFile(index)}
+                onClick={() => removeAttachedItem(index)}
                 className={styles["remove-file"]}
               >
                 ×
@@ -241,9 +311,7 @@ export function InputBox({
       {showContextMenu && contextMenuPosition && (
         <ContextMenu
           onSelect={(item) => {
-            if (item.type === "file") {
-              handleContextSelect({ name: item.name, path: item.path || "" });
-            }
+            handleContextSelect(item);
             setShowContextMenu(false);
           }}
           onClose={() => setShowContextMenu(false)}
@@ -257,15 +325,7 @@ export function InputBox({
       <div className={styles["input-footer"]}>
         <div className={styles["action-buttons"]}>
           <SelectAttachmentButton onFileSelect={handleFileSelect} />
-          <SendButton
-            onClick={() => {
-              const value = editorInstanceRef.current?.getValue() || "";
-              if (value.trim()) {
-                onSend(value);
-                editorInstanceRef.current?.setValue("");
-              }
-            }}
-          />
+          <SendButton onClick={send_chat_cmd} />
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
 import CircuitIcon from "../icons/eda/circuit.svg";
 import SymbolIcon from "../icons/eda/symbol.svg";
@@ -105,6 +105,10 @@ export function ContextMenu({
 }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [currentItems, setCurrentItems] = useState<ContextMenuItem[]>([
+    ...items,
+    ...defaultSections,
+  ]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -123,16 +127,24 @@ export function ContextMenu({
     }
   }, [showSearch]);
 
-  const allItems = [...items, ...defaultSections];
+  const handleItemClick = (item: ContextMenuItem) => {
+    if (item.type === "menu" && item.children) {
+      // Update the current items to show the children of the selected menu item
+      setCurrentItems(item.children);
+    } else {
+      // Trigger the onSelect callback for other item types
+      onSelect?.(item);
+    }
+  };
 
   const filteredItems =
     searchTerm && showSearch
-      ? allItems.filter(
+      ? currentItems.filter(
           (item) =>
             item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.path?.toLowerCase().includes(searchTerm.toLowerCase()),
         )
-      : allItems;
+      : currentItems;
 
   const style = position
     ? {
@@ -163,7 +175,7 @@ export function ContextMenu({
           <div
             key={item.id}
             className={styles.menuItem}
-            onClick={() => onSelect?.(item)}
+            onClick={() => handleItemClick(item)}
           >
             <span className={styles.icon}>{item.icon}</span>
             <div className={styles.itemContent}>

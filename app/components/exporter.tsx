@@ -524,7 +524,7 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-            <div className={styles["main-title"]}>NextChat</div>
+            <div className={styles["main-title"]}>ECAD Copilot</div>
             <div className={styles["sub-title"]}>
               github.com/Huaqiu-Electronics/ecad-copilot
             </div>

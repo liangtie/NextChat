@@ -100,7 +100,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web/releases/latest/download/latest.json"
+        "https://github.com/Huaqiu-Electronics/ecad-copilot/releases/latest/download/latest.json"
       ],
       "dialog": true,
       "windows": {

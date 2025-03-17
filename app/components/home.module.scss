@@ -140,6 +140,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   &-narrow {
     justify-content: center;
   }
@@ -147,6 +148,12 @@
 
 .sidebar-logo {
   display: inline-flex;
+
+  svg {
+    width: 36px;
+    height: 36px;
+    fill: var(--black);
+  }
 }
 
 .sidebar-title-container {
@@ -214,12 +221,12 @@
   cursor: pointer;
 }
 
-.chat-item:hover > .chat-item-delete {
+.chat-item:hover>.chat-item-delete {
   opacity: 0.5;
   transform: translateX(-4px);
 }
 
-.chat-item:hover > .chat-item-delete:hover {
+.chat-item:hover>.chat-item-delete:hover {
   opacity: 1;
 }
 
@@ -240,14 +247,22 @@
 }
 
 .narrow-sidebar {
+
   .sidebar-title,
   .sidebar-sub-title {
     display: none;
   }
+
   .sidebar-logo {
     position: relative;
     display: flex;
     justify-content: center;
+
+    svg {
+      width: 36px;
+      height: 36px;
+      fill: var(--black);
+    }
   }
 
   .sidebar-header-bar {
@@ -342,6 +357,12 @@
   align-items: center;
   height: 100%;
   width: 100%;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--black);
+  }
 }
 
 .rtl-screen {

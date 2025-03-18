@@ -27,9 +27,12 @@ import {
 
 interface InputBoxProps {
   onSend: (text: GENERIC_CHAT_CMD) => void;
+  value: string;
+  onFocus: () => void;
+  onClick: () => void;
 }
 
-export function InputBox({ onSend }: InputBoxProps) {
+export function InputBox({ onSend, value, onFocus, onClick }: InputBoxProps) {
   const config = useAppConfig();
   // Apply the appropriate theme based on system preference
   const applyTheme = () => {
@@ -303,7 +306,12 @@ export function InputBox({ onSend }: InputBoxProps) {
           ))}
         </div>
       </div>
-      <div className={styles["editor-container"]} ref={editorRef} />
+      <div
+        className={styles["editor-container"]}
+        ref={editorRef}
+        onClick={onClick}
+        onFocus={onFocus}
+      />
       {showContextMenu && contextMenuPosition && (
         <ContextMenu
           onSelect={(item) => {

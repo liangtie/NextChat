@@ -1,12 +1,20 @@
 import clsx from "clsx";
-import { useState, useRef, useMemo, useEffect, Fragment } from "react";
+import {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  Fragment,
+  useCallback,
+  RefObject,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { MultimodalContent } from "../client/api";
 import {
+  autoGrowTextArea,
   copyToClipboard,
   getMessageImages,
   getMessageTextContent,
-  safeLocalStorage,
   useMobileScreen,
 } from "../utils";
 import EditIcon from "../icons/rename.svg";
@@ -19,11 +27,7 @@ import CloseIcon from "../icons/close.svg";
 
 import StopIcon from "../icons/pause.svg";
 import { ChatControllerPool } from "../client/controller";
-import {
-  Path,
-  REQUEST_TIMEOUT_MS,
-  CHAT_PAGE_SIZE,
-} from "../constant";
+import { Path, REQUEST_TIMEOUT_MS, CHAT_PAGE_SIZE } from "../constant";
 import {
   CHAT_CMD,
   CMD_TYPE,
@@ -59,7 +63,46 @@ import styles from "./chat.module.scss";
 import { WelcomePage } from "./welcome-page";
 import { InputBox } from "./input-box";
 
-const localStorage = safeLocalStorage();
+function useScrollToBottom(
+  scrollRef: RefObject<HTMLDivElement>,
+  detach: boolean = false,
+  messages: ChatMessage[],
+) {
+  // for auto-scroll
+  const [autoScroll, setAutoScroll] = useState(true);
+  const scrollDomToBottom = useCallback(() => {
+    const dom = scrollRef.current;
+    if (dom) {
+      requestAnimationFrame(() => {
+        setAutoScroll(true);
+        dom.scrollTo(0, dom.scrollHeight);
+      });
+    }
+  }, [scrollRef]);
+
+  // auto scroll
+  useEffect(() => {
+    if (autoScroll && !detach) {
+      scrollDomToBottom();
+    }
+  });
+
+  // auto scroll when messages length changes
+  const lastMessagesLength = useRef(messages.length);
+  useEffect(() => {
+    if (messages.length > lastMessagesLength.current && !detach) {
+      scrollDomToBottom();
+    }
+    lastMessagesLength.current = messages.length;
+  }, [messages.length, detach, scrollDomToBottom]);
+
+  return {
+    scrollRef,
+    autoScroll,
+    setAutoScroll,
+    scrollDomToBottom,
+  };
+}
 
 function _Chat() {
   type RenderMessage = ChatMessage & { preview?: boolean };
@@ -70,15 +113,44 @@ function _Chat() {
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
   const [showExport, setShowExport] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [userInput, ] = useState("");
+  const [isLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolledToBottom = scrollRef?.current
+    ? Math.abs(
+        scrollRef.current.scrollHeight -
+          (scrollRef.current.scrollTop + scrollRef.current.clientHeight),
+      ) <= 1
+    : false;
+  const isAttachWithTop = useMemo(() => {
+    const lastMessage = scrollRef.current?.lastElementChild as HTMLElement;
+    // if scrolllRef is not ready or no message, return false
+    if (!scrollRef?.current || !lastMessage) return false;
+    const topDistance =
+      lastMessage!.getBoundingClientRect().top -
+      scrollRef.current.getBoundingClientRect().top;
+    // leave some space for user question
+    return topDistance < 100;
+  }, [scrollRef?.current?.scrollHeight]);
+
+  // if user is typing, should auto scroll to bottom
+  // if user is not typing, should auto scroll to bottom only if already at bottom
+  const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
+    scrollRef,
+    isScrolledToBottom || isAttachWithTop,
+    session.messages,
+  );
+  const [, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
   // stop response
   const onUserStop = (messageId: string) => {
     ChatControllerPool.stop(session.id, messageId);
   };
+
+  // auto grow input
+  // autoGrowTextArea
 
   useEffect(() => {
     chatStore.updateTargetSession(session, (session) => {
@@ -179,6 +251,8 @@ function _Chat() {
 
     const isTouchTopEdge = e.scrollTop <= edgeThreshold;
     const isTouchBottomEdge = bottomHeight >= e.scrollHeight - edgeThreshold;
+    const isHitBottom =
+      bottomHeight >= e.scrollHeight - (isMobileScreen ? 4 : 10);
 
     const prevPageMsgIndex = msgRenderIndex - CHAT_PAGE_SIZE;
     const nextPageMsgIndex = msgRenderIndex + CHAT_PAGE_SIZE;
@@ -188,7 +262,15 @@ function _Chat() {
     } else if (isTouchBottomEdge) {
       setMsgRenderIndex(nextPageMsgIndex);
     }
+
+    setHitBottom(isHitBottom);
+    setAutoScroll(isHitBottom);
   };
+
+  function scrollToBottom() {
+    setMsgRenderIndex(renderMessages.length - CHAT_PAGE_SIZE);
+    scrollDomToBottom();
+  }
 
   // clear context index = context length + index in messages
   const clearContextIndex =
@@ -511,6 +593,9 @@ function _Chat() {
                   if (text.trim() === "") return;
                   process_cmd(cmd);
                 }}
+                value={userInput}
+                onFocus={scrollToBottom}
+                onClick={scrollToBottom}
               />
             </div>
           </div>

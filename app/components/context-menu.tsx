@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
-import CircuitIcon from "../icons/eda/circuit.svg";
 import SymbolIcon from "../icons/eda/symbol.svg";
 import BookIcon from "../icons/book.svg";
-import GitIcon from "../icons/git.svg";
-import TerminalIcon from "../icons/terminal.svg";
-import ErrorIcon from "../icons/error.svg";
-import GlobeIcon from "../icons/globe.svg";
 import BomIcon from "../icons/kicad/bom.svg";
 import NetlistIcon from "../icons/kicad/netlist.svg";
 import { BUILTIN_REFERENCE } from "../kicad";
@@ -51,27 +46,18 @@ interface Props {
 
 const defaultSections: ContextMenuItem[] = [
   {
-    id: "schematic",
-    name: "Schematic",
-    icon: <CircuitIcon />,
-    type: "menu",
-    hasChildren: true,
-    children: [
-      {
-        id: "bom",
-        name: "bom",
-        icon: <BomIcon />,
-        type: "option",
-        opt: BUILTIN_REFERENCE.BOM,
-      },
-      {
-        id: "netlist",
-        name: "netlist",
-        icon: <NetlistIcon />,
-        type: "option",
-        opt: BUILTIN_REFERENCE.NET_LIST,
-      },
-    ],
+    id: "bom",
+    name: "bom",
+    icon: <BomIcon />,
+    type: "option",
+    opt: BUILTIN_REFERENCE.BOM,
+  },
+  {
+    id: "netlist",
+    name: "netlist",
+    icon: <NetlistIcon />,
+    type: "option",
+    opt: BUILTIN_REFERENCE.NET_LIST,
   },
   {
     id: "symbol",
@@ -86,33 +72,6 @@ const defaultSections: ContextMenuItem[] = [
     icon: <BookIcon />,
     type: "menu",
     hasChildren: true,
-  },
-  {
-    id: "git",
-    name: "Git",
-    icon: <GitIcon />,
-    type: "menu",
-    hasChildren: true,
-  },
-  {
-    id: "terminals",
-    name: "Terminals",
-    icon: <TerminalIcon />,
-    type: "menu",
-    hasChildren: true,
-  },
-  {
-    id: "errors",
-    name: "Errors",
-    icon: <ErrorIcon />,
-    type: "menu",
-    hasChildren: true,
-  },
-  {
-    id: "web",
-    name: "Web",
-    icon: <GlobeIcon />,
-    type: "action",
   },
 ];
 

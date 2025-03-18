@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
 import SymbolIcon from "../icons/eda/symbol.svg";
 import BookIcon from "../icons/book.svg";
-import BomIcon from "../icons/kicad/bom.svg";
-import NetlistIcon from "../icons/kicad/netlist.svg";
+import BomIcon from "../icons/eda/bom.svg";
+import GlobeIcon from "../icons/globe.svg";
+import NetlistIcon from "../icons/eda/graph.svg";
 import { BUILTIN_REFERENCE } from "../kicad";
 
 export interface ContextMenuItemBase {
@@ -61,17 +62,21 @@ const defaultSections: ContextMenuItem[] = [
   },
   {
     id: "symbol",
-    name: "Symbol",
+    name: "symbol",
     icon: <SymbolIcon />,
     type: "menu",
-    hasChildren: true,
   },
   {
     id: "docs",
-    name: "Docs",
+    name: "docs",
     icon: <BookIcon />,
     type: "menu",
-    hasChildren: true,
+  },
+  {
+    id: "web",
+    name: "web",
+    icon: <GlobeIcon />,
+    type: "menu",
   },
 ];
 

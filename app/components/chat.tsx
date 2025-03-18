@@ -65,7 +65,6 @@ import { InputBox } from "./input-box";
 
 function useScrollToBottom(
   scrollRef: RefObject<HTMLDivElement>,
-  detach: boolean = false,
   messages: ChatMessage[],
 ) {
   // for auto-scroll
@@ -82,7 +81,7 @@ function useScrollToBottom(
 
   // auto scroll
   useEffect(() => {
-    if (autoScroll && !detach) {
+    if (autoScroll) {
       scrollDomToBottom();
     }
   });
@@ -90,11 +89,11 @@ function useScrollToBottom(
   // auto scroll when messages length changes
   const lastMessagesLength = useRef(messages.length);
   useEffect(() => {
-    if (messages.length > lastMessagesLength.current && !detach) {
+    if (messages.length > lastMessagesLength.current) {
       scrollDomToBottom();
     }
     lastMessagesLength.current = messages.length;
-  }, [messages.length, detach, scrollDomToBottom]);
+  }, [messages.length, scrollDomToBottom]);
 
   return {
     scrollRef,
@@ -117,18 +116,11 @@ function _Chat() {
   const [userInput] = useState("");
   const [isLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isScrolledToBottom = scrollRef?.current
-    ? Math.abs(
-        scrollRef.current.scrollHeight -
-          (scrollRef.current.scrollTop + scrollRef.current.clientHeight),
-      ) <= 1
-    : false;
 
   // if user is typing, should auto scroll to bottom
   // if user is not typing, should auto scroll to bottom only if already at bottom
   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
     scrollRef,
-    isScrolledToBottom,
     session.messages,
   );
   const [, setHitBottom] = useState(true);

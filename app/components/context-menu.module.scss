@@ -117,3 +117,7 @@
     margin-left: 4px;
   }
 }
+
+.menuItem.selected {
+  background-color: var(--vscode-list-hoverBackground);
+}

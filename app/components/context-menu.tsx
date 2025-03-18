@@ -91,6 +91,14 @@ export function ContextMenu({
     ...items,
     ...defaultSections,
   ]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  // Focus on menu when it opens
+  useEffect(() => {
+    if (menuRef.current) {
+      menuRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -111,11 +119,38 @@ export function ContextMenu({
 
   const handleItemClick = (item: ContextMenuItem) => {
     if (item.type === "menu" && item.children) {
-      // Update the current items to show the children of the selected menu item
       setCurrentItems(item.children);
+      setSelectedIndex(null);
     } else {
-      // Trigger the onSelect callback for other item types
       onSelect?.(item);
+      onClose?.(); // Close menu after selection
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!currentItems.length) return;
+
+    switch (event.key) {
+      case "ArrowDown":
+        setSelectedIndex((prev) =>
+          prev === null || prev >= currentItems.length - 1 ? 0 : prev + 1,
+        );
+        break;
+      case "ArrowUp":
+        setSelectedIndex((prev) =>
+          prev === null || prev <= 0 ? currentItems.length - 1 : prev - 1,
+        );
+        break;
+      case "Enter":
+        if (selectedIndex !== null) {
+          handleItemClick(currentItems[selectedIndex]);
+        }
+        break;
+      case "Escape":
+        onClose?.();
+        break;
+      default:
+        break;
     }
   };
 
@@ -140,7 +175,13 @@ export function ContextMenu({
     : {};
 
   return (
-    <div className={styles.contextMenu} ref={menuRef} style={style}>
+    <div
+      className={styles.contextMenu}
+      ref={menuRef}
+      style={style}
+      tabIndex={-1}
+      onKeyDown={handleKeyDown}
+    >
       {showSearch && (
         <div className={styles.searchContainer}>
           <input
@@ -153,10 +194,12 @@ export function ContextMenu({
         </div>
       )}
       <div className={styles.menuItems}>
-        {filteredItems.map((item) => (
+        {filteredItems.map((item, index) => (
           <div
             key={item.id}
-            className={styles.menuItem}
+            className={`${styles.menuItem} ${
+              index === selectedIndex ? styles.selected : ""
+            }`}
             onClick={() => handleItemClick(item)}
           >
             <span className={styles.icon}>{item.icon}</span>

@@ -1,15 +1,14 @@
 export enum CMD_TYPE {
-  GENERIC_CHAT = -1,
-  INVALID = 0,
+  GENERIC_CHAT = "chat.user.generic_chat",
 
-  DESIGN_INTENTION = 1,
-  CORE_COMPONENTS = 2,
+  DESIGN_INTENTION = "chat.design.intention",
+  CORE_COMPONENTS = "chat.design.core_components",
 
-  CURRENT_COMPONENT = 3,
-  SIMILAR_COMPONENTS = 4,
-  CHECK_SYMBOL_CONNECTIONS = 5,
-  COMPONENT_PINS_DETAILS = 6,
-  SYMBOL_UNCONNECTED_PINS = 7,
+  CURRENT_COMPONENT = "chat.components.current_component",
+  SIMILAR_COMPONENTS = "chat.components.similar_components",
+  CHECK_SYMBOL_CONNECTIONS = "chat.components.check_symbol_connections",
+  COMPONENT_PINS_DETAILS = "chat.components.component_pins_details",
+  SYMBOL_UNCONNECTED_PINS = "chat.components.symbol_unconnected_pins",
 }
 
 export type SYMBOL_CMD_TYPE =

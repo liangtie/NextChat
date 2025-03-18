@@ -88,6 +88,7 @@ export function InputBox({ onSend }: InputBoxProps) {
   const handleKeyDown = (e: monaco.IKeyboardEvent) => {
     if (e.keyCode === monaco.KeyCode.Escape) {
       setShowContextMenu(false);
+      setTimeout(() => editorInstanceRef.current?.focus(), 0);
       return;
     }
 
@@ -104,37 +105,36 @@ export function InputBox({ onSend }: InputBoxProps) {
 
     if (model && position) {
       const content = model.getLineContent(position.lineNumber);
-      const lastChar = content[position.column - 2];
-      const currentChar = content[position.column - 1];
+      const lastChar = content[position.column - 2] || ""; // Before current cursor
+      const currentChar = content[position.column - 1] || ""; // Current cursor
 
       if (lastChar === "@" && !currentChar) {
+        // User typed "@" and no other character after it
         const atCharPosition = {
           lineNumber: position.lineNumber,
-          column: position.column - 1, // Position of the @ character
+          column: position.column - 1,
         };
         const coords =
           editorInstanceRef.current?.getScrolledVisiblePosition(atCharPosition);
         if (coords && editorRef.current) {
           const editorRect = editorRef.current.getBoundingClientRect();
-          const menuWidth = 400; // Approximate menu width
+          const menuWidth = 400;
 
-          // Calculate initial position - align menu's bottom with the @ character
-          let x = editorRect.left + coords.left + 8; // Slightly to the right of @
-          let y = editorRect.top + coords.top; // Align with the @ character
+          let x = editorRect.left + coords.left + 8;
+          let y = editorRect.top + coords.top;
 
-          // Ensure menu stays within viewport
           if (x + menuWidth > window.innerWidth) {
             x = window.innerWidth - menuWidth - 10;
           }
 
-          // Ensure minimum margins
           x = Math.max(10, x);
 
           setContextMenuPosition({ x, y });
           setShowContextMenu(true);
           setSearchTerm("");
         }
-      } else {
+      } else if (!content.includes("@")) {
+        // If "@" is no longer present in the input, close the menu
         setShowContextMenu(false);
       }
     }
@@ -258,31 +258,31 @@ export function InputBox({ onSend }: InputBoxProps) {
       }
     }
 
-    // Remove the @ character from the editor if it was triggered by typing
+    // Remove "@" from the editor
     const editor = editorInstanceRef.current;
     if (editor && showContextMenu) {
-      // showContextMenu indicates it was triggered by typing @
       const model = editor.getModel();
       const position = editor.getPosition();
 
       if (model && position) {
         const range = new monaco.Range(
           position.lineNumber,
-          position.column - 1, // Remove the @ character
+          position.column - 1,
           position.lineNumber,
           position.column,
         );
 
-        editor.executeEdits("", [
-          {
-            range,
-            text: "", // Replace @ with empty string
-            forceMoveMarkers: true,
-          },
-        ]);
+        editor.executeEdits("", [{ range, text: "", forceMoveMarkers: true }]);
       }
     }
+
+    // Close context menu and restore editor focus
     setShowContextMenu(false);
+    setTimeout(() => editorInstanceRef.current?.focus(), 0);
+  };
+
+  const onCtxMenuClose = () => {
+    setTimeout(() => editorInstanceRef.current?.focus(), 0);
   };
 
   return (
@@ -310,7 +310,10 @@ export function InputBox({ onSend }: InputBoxProps) {
             handleContextSelect(item);
             setShowContextMenu(false);
           }}
-          onClose={() => setShowContextMenu(false)}
+          onClose={() => {
+            setShowContextMenu(false);
+            onCtxMenuClose();
+          }}
           position={contextMenuPosition}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}

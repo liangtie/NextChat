@@ -147,6 +147,7 @@ export function ContextMenu({
         }
         break;
       case "Escape":
+      case "Backspace":
         onClose?.();
         break;
       default:

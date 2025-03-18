@@ -56,6 +56,11 @@ class WebSocketStream {
         case WEBSOCKET_MESSAGE_TYPE.STREAMING:
           this.remainText += res.msg;
           break;
+        case WEBSOCKET_MESSAGE_TYPE.PROMPT:
+          this.remainText += "### Prompt:\n";
+          this.remainText += res.msg;
+          this.remainText += "\n";
+          break;
       }
     } catch (e) {
       console.log("[Websocket] error", e);

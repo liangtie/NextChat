@@ -126,7 +126,6 @@ import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
 import { CONTEXT_MENU_CMD, READABLE_CMD } from "../kicad";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../kicad/constant";
 import { websocketClient } from "../websocket";
-import { InputBox } from "./input-box";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -804,6 +803,72 @@ function _Chat() {
               </div>
             </div>
           )}
+
+          <div
+            className={clsx("window-header-title", styles["chat-body-title"])}
+          >
+            <div
+              className={clsx(
+                "window-header-main-title",
+                styles["chat-body-main-title"],
+              )}
+              onClickCapture={() => setIsEditingMessage(true)}
+            >
+              {!session.topic ? DEFAULT_TOPIC : session.topic}
+            </div>
+            <div className="window-header-sub-title">
+              {Locale.Chat.SubTitle(session.messages.length)}
+            </div>
+          </div>
+          <div className="window-actions">
+            <div className="window-action-button">
+              <IconButton
+                icon={<ReloadIcon />}
+                bordered
+                title={Locale.Chat.Actions.RefreshTitle}
+                onClick={() => {
+                  showToast(Locale.Chat.Actions.RefreshToast);
+                  chatStore.summarizeSession(true, session);
+                }}
+              />
+            </div>
+            {!isMobileScreen && (
+              <div className="window-action-button">
+                <IconButton
+                  icon={<RenameIcon />}
+                  bordered
+                  title={Locale.Chat.EditMessage.Title}
+                  aria={Locale.Chat.EditMessage.Title}
+                  onClick={() => setIsEditingMessage(true)}
+                />
+              </div>
+            )}
+            <div className="window-action-button">
+              <IconButton
+                icon={<ExportIcon />}
+                bordered
+                title={Locale.Chat.Actions.Export}
+                onClick={() => {
+                  setShowExport(true);
+                }}
+              />
+            </div>
+            {showMaxIcon && (
+              <div className="window-action-button">
+                <IconButton
+                  icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
+                  bordered
+                  title={Locale.Chat.Actions.FullScreen}
+                  aria={Locale.Chat.Actions.FullScreen}
+                  onClick={() => {
+                    config.update(
+                      (config) => (config.tightBorder = !config.tightBorder),
+                    );
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles["chat-main"]}>
           <div className={styles["chat-body-container"]}>
@@ -1007,25 +1072,34 @@ function _Chat() {
                   );
                 })}
             </div>
-            <div className={styles["chat-input-panel-container"]}>
-              <textarea
-                id="chat-input"
-                ref={inputRef}
-                className={styles["chat-input"]}
-                placeholder={Locale.Chat.Input(submitKey)}
-                onInput={(e) => onInput(e.currentTarget.value)}
-                value={userInput}
-                onKeyDown={onInputKeyDown}
-                onFocus={scrollToBottom}
-                onClick={scrollToBottom}
-                onPaste={handlePaste}
-                rows={inputRows}
-                autoFocus={autoFocus}
-                style={{
-                  fontSize: config.fontSize,
-                  fontFamily: config.fontFamily,
-                }}
-              />
+            <div className={styles["chat-input-panel"]}>
+              <label
+                className={clsx(styles["chat-input-panel-inner"], {
+                  [styles["chat-input-panel-inner-attach"]]:
+                    attachImages.length !== 0,
+                })}
+                htmlFor="chat-input"
+              >
+                <LoadingButtonIcon />
+                <textarea
+                  id="chat-input"
+                  ref={inputRef}
+                  className={styles["chat-input"]}
+                  placeholder={Locale.Chat.Input(submitKey)}
+                  onInput={(e) => onInput(e.currentTarget.value)}
+                  value={userInput}
+                  onKeyDown={onInputKeyDown}
+                  onFocus={scrollToBottom}
+                  onClick={scrollToBottom}
+                  onPaste={handlePaste}
+                  rows={inputRows}
+                  autoFocus={autoFocus}
+                  style={{
+                    fontSize: config.fontSize,
+                    fontFamily: config.fontFamily,
+                  }}
+                />
+              </label>
             </div>
           </div>
           <div

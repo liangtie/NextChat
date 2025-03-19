@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import styles from "./select-attachment-button.module.scss";
-import Attachment from "../icons/attachment.svg";
+import Attachment from "../../icons/attachment.svg";
 
 interface Props {
   onFileSelect?: (file: File) => void;

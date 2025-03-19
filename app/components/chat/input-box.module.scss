@@ -107,3 +107,45 @@
     background-color: var(--primary-dark);
   }
 }
+
+
+.chat-input {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+  background-color: var(--white);
+  color: var(--black);
+  font-family: inherit;
+  padding: 10px 90px 10px 14px;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  min-height: 68px;
+}
+
+.chat-input:focus {}
+
+
+@media only screen and (max-width: 600px) {
+  .chat-input {
+    font-size: 16px;
+  }
+}
+
+.chat-input-panel-inner {
+  cursor: text;
+  display: flex;
+  flex: 1;
+  border-radius: 10px;
+  border: var(--border-in-light);
+}
+
+.chat-input-panel-inner-attach {
+  padding-bottom: 80px;
+}
+
+.chat-input-panel-inner:has(.chat-input:focus) {
+  border: 1px solid var(--primary);
+}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import styles from "./select-context-button.module.scss";
-import AtSign from "../icons/at-sign.svg";
+import AtSign from "../../icons/at-sign.svg";
 import { ContextMenu, ContextMenuItem } from "./context-menu";
 
 interface Props {

@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, ReactNode } from "react";
+import Locale from "../../locales";
 import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
 import { SelectAttachmentButton } from "./select-attachment-button";
@@ -11,126 +12,198 @@ import {
 } from "./context-attachment";
 import {
   BUILTIN_REFERENCE,
+  CHAT_CMD,
   CMD_TYPE,
+  CONTEXT_MENU_CMD,
   DESIGN_GLOBAL_CONTEXT,
   GENERIC_CHAT_CMD,
+  READABLE_CMD,
 } from "../../kicad";
-import { WEBVIEW_FUNCTIONS } from "../../kicad/constant";
+import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../kicad/constant";
 import {
   fire_kicad_desktop_cmd,
   KICAD_DESKTOP_CMD_TYPE,
 } from "../../kicad/cmd/kicad_desktop";
+import clsx from "clsx";
+import { DeleteImageButton, useSubmitHandler } from "./chat-utils";
+import { autoGrowTextArea, useMobileScreen } from "@/app/utils";
+import {
+  ChatMessage,
+  createMessage,
+  useAppConfig,
+  useChatStore,
+} from "@/app/store";
+import { useDebouncedCallback } from "use-debounce";
+import { ChatControllerPool } from "@/app/client/controller";
+import { Path } from "@/app/constant";
+import { websocketClient } from "@/app/websocket";
+import { useNavigate } from "react-router-dom";
+import { isEmpty } from "lodash-es";
+import { ChatCommandPrefix } from "@/app/command";
 
 interface InputBoxProps {
-  // onSend: (text: GENERIC_CHAT_CMD) => void;
-  // onFocus: () => void;
-  // onClick: () => void;
-  editor: ReactNode;
+  inputRef: React.RefObject<HTMLTextAreaElement>;
+  userInput: string;
+  scrollToBottom: () => void;
+  setUserInput: (value: string) => void;
+  setAutoScroll: (value: boolean) => void;
 }
 
 export function InputBox({
-  // onSend, onFocus, onClick,
-  editor,
+  inputRef,
+  userInput,
+  scrollToBottom,
+  setUserInput,
+  setAutoScroll,
 }: InputBoxProps) {
+  const chatStore = useChatStore();
   const [refs, setRefs] = useState(new Set<BUILTIN_REFERENCE>());
   const global_ctx = useRef<DESIGN_GLOBAL_CONTEXT>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
   const [attachedItems, setAttachedItems] = useState<AttachmentItem[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;
     y: number;
   }>();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [attachImages, setAttachImages] = useState<string[]>([]);
+  const isMobileScreen = useMobileScreen();
 
-  const send_chat_cmd = () => {
-    {
-      // onSend({
-      //   type: CMD_TYPE.GENERIC_CHAT,
-      //   context: {
-      //     chat: {
-      //       input_text: "wefe",
-      //       options: {
-      //         builtin_refs: [...refs],
-      //       },
-      //     },
-      //   },
-      //   global_context_uuid: global_ctx.current?.uuid || undefined,
-      //   design_global_context: global_ctx.current ?? undefined,
-      // });
+  const process_cmd = async (cmd: CHAT_CMD) => {
+    const userMessage: ChatMessage = createMessage({
+      role: "user",
+      content:
+        cmd.type !== CMD_TYPE.GENERIC_CHAT
+          ? READABLE_CMD[cmd.type]
+          : cmd.context.chat.input_text,
+      isMcpResponse: false,
+    });
+
+    const botMessage: ChatMessage = createMessage({
+      role: "assistant",
+      streaming: true,
+      model: ASSISTANT_NAME,
+    });
+
+    const session = chatStore.currentSession();
+    chatStore.updateTargetSession(session, (session) => {
+      const savedUserMessage = {
+        ...userMessage,
+      };
+      session.messages = session.messages.concat([
+        savedUserMessage,
+        botMessage,
+      ]);
+    });
+
+    websocketClient.send_cmd(cmd, {
+      onFinish: () => {
+        botMessage.streaming = false;
+        ChatControllerPool.remove(session.id, botMessage.id);
+      },
+      onUpdate: (message: string) => {
+        botMessage.streaming = true;
+        botMessage.content = message;
+        chatStore.updateTargetSession(session, (session) => {
+          session.messages = session.messages.concat();
+        });
+      },
+    });
+  };
+
+  // remember unfinished input
+  useEffect(() => {
+    window[WEBVIEW_FUNCTIONS.fire_copilot_cmd] = (cmd: CONTEXT_MENU_CMD) => {
+      navigate(Path.Chat);
+      process_cmd(cmd);
+    };
+  }, []);
+
+  const onInput = (text: string) => {
+    setUserInput(text);
+
+    if (!inputRef.current) return;
+
+    const cursorPosition = inputRef.current.selectionStart || 0;
+    const lastChar = text[cursorPosition - 1] || ""; // Current cursor
+
+    if (lastChar === "@") {
+      const editorRect = inputRef.current.getBoundingClientRect();
+      const menuWidth = 400;
+
+      // Create a temporary span to measure text width
+      const tempSpan = document.createElement("span");
+      tempSpan.style.visibility = "hidden";
+      tempSpan.style.whiteSpace = "pre";
+      tempSpan.style.font = getComputedStyle(inputRef.current).font;
+      tempSpan.textContent = text.slice(0, cursorPosition);
+      document.body.appendChild(tempSpan);
+
+      const textWidth = tempSpan.offsetWidth;
+      document.body.removeChild(tempSpan);
+
+      const x = Math.min(
+        editorRect.left + textWidth,
+        window.innerWidth - menuWidth,
+      );
+      const y = editorRect.bottom + 5; // Small offset to position below text
+
+      setContextMenuPosition({ x, y });
+      setShowContextMenu(true);
+      setSearchTerm("");
+    } else if (!text.includes("@")) {
+      setShowContextMenu(false);
     }
   };
 
-  // Handle editor key events
-  // const handleKeyDown = (e: monaco.IKeyboardEvent) => {
-  //   if (e.keyCode === monaco.KeyCode.Escape) {
-  //     setShowContextMenu(false);
-  //     setTimeout(() => editorInstanceRef.current?.focus(), 0);
-  //     return;
-  //   }
+  const doSubmit = () => {
+    if (userInput.trim() === "" && isEmpty(attachImages)) return;
 
-  //   if (e.keyCode === monaco.KeyCode.Enter && !e.shiftKey) {
-  //     e.preventDefault();
-  //     send_chat_cmd();
-  //   }
-  // };
+    process_cmd({
+      type: CMD_TYPE.GENERIC_CHAT,
+      context: {
+        chat: {
+          input_text: userInput,
+          options: {
+            builtin_refs: [...refs],
+          },
+        },
+      },
+      global_context_uuid: global_ctx.current?.uuid || undefined,
+      design_global_context: global_ctx.current ?? undefined,
+    });
 
-  // Handle content changes
-  // const handleContentChange = () => {
-  //   const model = editorInstanceRef.current?.getModel();
-  //   const position = editorInstanceRef.current?.getPosition();
+    setAttachImages([]);
+    chatStore.setLastInput(userInput);
+    setUserInput("");
+    if (!isMobileScreen) inputRef.current?.focus();
+    setAutoScroll(true);
+  };
 
-  //   if (model && position) {
-  //     const content = model.getLineContent(position.lineNumber);
-  //     const lastChar = content[position.column - 2] || ""; // Before current cursor
-  //     const currentChar = content[position.column - 1] || ""; // Current cursor
+  const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
+  const { submitKey, shouldSubmit } = useSubmitHandler();
+  const [searchTerm, setSearchTerm] = useState("");
+  const config = useAppConfig();
+  // auto grow input
+  const [inputRows, setInputRows] = useState(2);
+  const measure = useDebouncedCallback(
+    () => {
+      const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1;
+      const inputRows = Math.min(
+        20,
+        Math.max(2 + Number(!isMobileScreen), rows),
+      );
+      setInputRows(inputRows);
+    },
+    100,
+    {
+      leading: true,
+      trailing: true,
+    },
+  );
 
-  //     if (lastChar === "@" && !currentChar) {
-  //       // User typed "@" and no other character after it
-  //       const atCharPosition = {
-  //         lineNumber: position.lineNumber,
-  //         column: position.column - 1,
-  //       };
-  //       const coords =
-  //         editorInstanceRef.current?.getScrolledVisiblePosition(atCharPosition);
-  //       if (coords && editorRef.current) {
-  //         const editorRect = editorRef.current.getBoundingClientRect();
-  //         const menuWidth = 400;
-
-  //         let x = editorRect.left + coords.left + 8;
-  //         let y = editorRect.top + coords.top;
-
-  //         if (x + menuWidth > window.innerWidth) {
-  //           x = window.innerWidth - menuWidth - 10;
-  //         }
-
-  //         x = Math.max(10, x);
-
-  //         setContextMenuPosition({ x, y });
-  //         setShowContextMenu(true);
-  //         setSearchTerm("");
-  //       }
-  //     } else if (!content.includes("@")) {
-  //       // If "@" is no longer present in the input, close the menu
-  //       setShowContextMenu(false);
-  //     }
-  //   }
-  // };
-
-  // Handle mouse events
-  // const handleMouseDown = () => {
-  //   if (showContextMenu) {
-  //     setShowContextMenu(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   window[WEBVIEW_FUNCTIONS.update_global_ctx] = (
-  //     ctx: DESIGN_GLOBAL_CONTEXT,
-  //   ) => {
-  //     (global_ctx.current as DESIGN_GLOBAL_CONTEXT | null) = ctx;
-  //   };
-  // }, [onSend]); // Only depend on onSend since it might change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(measure, [userInput]);
+  const navigate = useNavigate();
 
   const handleFileSelect = (file: File) => {
     setAttachedItems([
@@ -185,29 +258,38 @@ export function InputBox({
     }
 
     // Remove "@" from the editor
-    // if (editor && showContextMenu) {
-    //   const model = editor.getModel();
-    //   const position = editor.getPosition();
-
-    //   if (model && position) {
-    //     const range = new monaco.Range(
-    //       position.lineNumber,
-    //       position.column - 1,
-    //       position.lineNumber,
-    //       position.column,
-    //     );
-
-    //     editor.executeEdits("", [{ range, text: "", forceMoveMarkers: true }]);
-    //   }
-    // }
+    if (inputRef.current && showContextMenu)
+      setUserInput(userInput.slice(0, -1));
 
     // Close context menu and restore editor focus
     setShowContextMenu(false);
-    // setTimeout(() => editor.focus(), 0);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  // check if should send message
+  const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // if ArrowUp and no userInput, fill with last input
+    if (
+      e.key === "ArrowUp" &&
+      userInput.length <= 0 &&
+      !(e.metaKey || e.altKey || e.ctrlKey)
+    ) {
+      setUserInput(chatStore.lastInput ?? "");
+      e.preventDefault();
+      return;
+    }
+    if (shouldSubmit(e)) {
+      doSubmit();
+      e.preventDefault();
+    }
+
+    if (showContextMenu) {
+      setShowContextMenu(false);
+    }
   };
 
   const onCtxMenuClose = () => {
-    // setTimeout(() => editor.focus(), 0);
+    setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   return (
@@ -228,7 +310,30 @@ export function InputBox({
           ))}
         </div>
       </div>
-
+      <label
+        className={clsx(styles["chat-input-panel-inner"], {
+          [styles["chat-input-panel-inner-attach"]]: attachImages.length !== 0,
+        })}
+        htmlFor="chat-input"
+      >
+        <textarea
+          id="chat-input"
+          ref={inputRef}
+          className={styles["chat-input"]}
+          placeholder={Locale.Chat.Input(submitKey)}
+          onInput={(e) => onInput(e.currentTarget.value)}
+          value={userInput}
+          onKeyDown={onInputKeyDown}
+          onFocus={scrollToBottom}
+          onClick={scrollToBottom}
+          rows={inputRows}
+          autoFocus={autoFocus}
+          style={{
+            fontSize: config.fontSize,
+            fontFamily: config.fontFamily,
+          }}
+        />
+      </label>{" "}
       {showContextMenu && contextMenuPosition && (
         <ContextMenu
           onSelect={(item) => {
@@ -249,7 +354,7 @@ export function InputBox({
       <div className={styles["input-footer"]}>
         <div className={styles["action-buttons"]}>
           <SelectAttachmentButton onFileSelect={handleFileSelect} />
-          <SendButton onClick={send_chat_cmd} />
+          <SendButton onClick={doSubmit} />
         </div>
       </div>
     </div>

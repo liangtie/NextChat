@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
-import SymbolIcon from "../icons/eda/symbol.svg";
-import BookIcon from "../icons/book.svg";
-import BomIcon from "../icons/eda/bom.svg";
-import GlobeIcon from "../icons/globe.svg";
-import NetlistIcon from "../icons/eda/graph.svg";
+import SymbolIcon from "../../icons/eda/symbol.svg";
+import BookIcon from "../../icons/book.svg";
+import BomIcon from "../../icons/eda/bom.svg";
+import GlobeIcon from "../../icons/globe.svg";
+import NetlistIcon from "../../icons/eda/graph.svg";
 import { BUILTIN_REFERENCE } from "../../kicad";
 
 export interface ContextMenuItemBase {

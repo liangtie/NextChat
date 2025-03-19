@@ -1,11 +1,4 @@
-import { useDebouncedCallback } from "use-debounce";
-import React, {
-  Fragment,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import CopyIcon from "../icons/copy.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
@@ -23,13 +16,11 @@ import {
 } from "../store";
 
 import {
-  autoGrowTextArea,
   copyToClipboard,
   getMessageImages,
   getMessageTextContent,
   useMobileScreen,
 } from "../utils";
-
 
 import { ChatControllerPool } from "../client/controller";
 import Locale from "../locales";
@@ -48,13 +39,18 @@ import { MaskAvatar } from "./mask";
 import { ChatCommandPrefix } from "../command";
 import { prettyObject } from "../utils/format";
 
-import { isEmpty } from "lodash-es";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { CONTEXT_MENU_CMD, READABLE_CMD } from "../kicad";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../kicad/constant";
 import { websocketClient } from "../websocket";
-import { ChatAction, DeleteImageButton, Markdown, useScrollToBottom, useSubmitHandler } from "./chat/chat-utils";
+import {
+  ChatAction,
+  Markdown,
+  useScrollToBottom,
+  useSubmitHandler,
+} from "./chat/chat-utils";
+import { InputBox } from "./chat/input-box";
 
 function _Chat() {
   type RenderMessage = ChatMessage & { preview?: boolean };
@@ -80,43 +76,6 @@ function _Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
-  const [attachImages, setAttachImages] = useState<string[]>([]);
-
-  // auto grow input
-  const [inputRows, setInputRows] = useState(2);
-  const measure = useDebouncedCallback(
-    () => {
-      const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1;
-      const inputRows = Math.min(
-        20,
-        Math.max(2 + Number(!isMobileScreen), rows),
-      );
-      setInputRows(inputRows);
-    },
-    100,
-    {
-      leading: true,
-      trailing: true,
-    },
-  );
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(measure, [userInput]);
-
-  const doSubmit = (userInput: string) => {
-    if (userInput.trim() === "" && isEmpty(attachImages)) return;
-
-    setIsLoading(true);
-    chatStore
-      .onUserInput(userInput, attachImages)
-      .then(() => setIsLoading(false));
-    setAttachImages([]);
-    chatStore.setLastInput(userInput);
-    setUserInput("");
-    if (!isMobileScreen) inputRef.current?.focus();
-    setAutoScroll(true);
-  };
-
   // stop response
   const onUserStop = (messageId: string) => {
     ChatControllerPool.stop(session.id, messageId);
@@ -151,24 +110,6 @@ function _Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
-  // check if should send message
-  const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // if ArrowUp and no userInput, fill with last input
-    if (
-      e.key === "ArrowUp" &&
-      userInput.length <= 0 &&
-      !(e.metaKey || e.altKey || e.ctrlKey)
-    ) {
-      setUserInput(chatStore.lastInput ?? "");
-      e.preventDefault();
-      return;
-    }
-    if (shouldSubmit(e)) {
-      doSubmit(userInput);
-      e.preventDefault();
-    }
-  };
-
   const deleteMessage = (msgId?: string) => {
     chatStore.updateTargetSession(
       session,
@@ -179,16 +120,6 @@ function _Chat() {
 
   const onDelete = (msgId: string) => {
     deleteMessage(msgId);
-  };
-
-  const onInput = (text: string) => {
-    setUserInput(text);
-    const n = text.trim().length;
-
-    // clear search results
-    if (n === 0) {
-    } else if (text.match(ChatCommandPrefix)) {
-    }
   };
 
   const onPinMessage = (message: ChatMessage) => {
@@ -283,8 +214,6 @@ function _Chat() {
     setMsgRenderIndex(renderMessages.length - CHAT_PAGE_SIZE);
     scrollDomToBottom();
   }
-
-  const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
 
   // remember unfinished input
   useEffect(() => {
@@ -545,56 +474,14 @@ function _Chat() {
                   );
                 })}
             </div>
-            <div className={styles["chat-input-panel"]}>
-              <label
-                className={clsx(styles["chat-input-panel-inner"], {
-                  [styles["chat-input-panel-inner-attach"]]:
-                    attachImages.length !== 0,
-                })}
-                htmlFor="chat-input"
-              >
-                <textarea
-                  id="chat-input"
-                  ref={inputRef}
-                  className={styles["chat-input"]}
-                  placeholder={Locale.Chat.Input(submitKey)}
-                  onInput={(e) => onInput(e.currentTarget.value)}
-                  value={userInput}
-                  onKeyDown={onInputKeyDown}
-                  onFocus={scrollToBottom}
-                  onClick={scrollToBottom}
-                  rows={inputRows}
-                  autoFocus={autoFocus}
-                  style={{
-                    fontSize: config.fontSize,
-                    fontFamily: config.fontFamily,
-                  }}
-                />
-                {attachImages.length != 0 && (
-                  <div className={styles["attach-images"]}>
-                    {attachImages.map((image, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className={styles["attach-image"]}
-                          style={{ backgroundImage: `url("${image}")` }}
-                        >
-                          <div className={styles["attach-image-mask"]}>
-                            <DeleteImageButton
-                              deleteImage={() => {
-                                setAttachImages(
-                                  attachImages.filter((_, i) => i !== index),
-                                );
-                              }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </label>
-            </div>
+            <div className={styles["chat-input-panel"]}></div>
+            <InputBox
+              inputRef={inputRef}
+              userInput={userInput}
+              scrollToBottom={scrollToBottom}
+              setUserInput={setUserInput}
+              setAutoScroll={setAutoScroll}
+            />
           </div>
           <div
             className={clsx(styles["chat-side-panel"], {

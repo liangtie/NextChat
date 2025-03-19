@@ -43,9 +43,7 @@ body>nextjs-portal {
   /* List hover background */
   --vscode-foreground: #cccccc;
   /* General foreground color */
-  --vscode-editor-background: rgb(225, 225, 225);
-
-
+  --vscode-editor-background: rgb(255, 255, 255);
 }
 
 @mixin dark {
@@ -56,7 +54,6 @@ body>nextjs-portal {
   --black: rgb(187, 187, 187);
   --gray: rgb(21, 21, 21);
   --ansiBlack: rgb(49, 49, 49);
-  ;
   --primary: rgb(29, 147, 171);
   --second: rgb(27 38 42);
   --hover-color: #323232;

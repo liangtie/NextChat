@@ -56,7 +56,7 @@ class WebSocketStream {
         case WEBSOCKET_MESSAGE_TYPE.STREAMING:
           this.remainText += res.msg;
           break;
-        case WEBSOCKET_MESSAGE_TYPE.PROMPT:
+        case WEBSOCKET_MESSAGE_TYPE.DEBUG:
           this.remainText += "### Prompt:\n";
           this.remainText += res.msg;
           this.remainText += "\n";

@@ -14,12 +14,12 @@ import {
   CMD_TYPE,
   DESIGN_GLOBAL_CONTEXT,
   GENERIC_CHAT_CMD,
-} from "../kicad";
-import { WEBVIEW_FUNCTIONS } from "../kicad/constant";
+} from "../../kicad";
+import { WEBVIEW_FUNCTIONS } from "../../kicad/constant";
 import {
   fire_kicad_desktop_cmd,
   KICAD_DESKTOP_CMD_TYPE,
-} from "../kicad/cmd/kicad_desktop";
+} from "../../kicad/cmd/kicad_desktop";
 
 interface InputBoxProps {
   // onSend: (text: GENERIC_CHAT_CMD) => void;

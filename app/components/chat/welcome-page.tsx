@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./welcome-page.module.scss";
-import Locale from "../locales";
+import Locale from "../../locales";
 import Copilot from "../icons/copilot.svg";
 import Attachment from "../icons/attachment.svg";
 

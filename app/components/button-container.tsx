@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./button-container.module.scss";
-import { SelectAttachmentButton } from "./select-attachment-button";
-import { SendButton } from "./send-button";
+import { SelectAttachmentButton } from "./chat/select-attachment-button";
+import { SendButton } from "./chat/send-button";
 
 interface Props {
   onFileSelect?: (file: File) => void;

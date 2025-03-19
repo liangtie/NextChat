@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./send-button.module.scss";
-import Locale from "../locales";
+import Locale from "../../locales";
 
 interface Props {
   onClick?: () => void;
@@ -13,4 +13,4 @@ export function SendButton({ onClick }: Props) {
       <span className={styles.keybinding}>⏎</span>
     </div>
   );
-} 
+}

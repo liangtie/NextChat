@@ -1,4 +1,4 @@
-import { BUILTIN_REFERENCE } from "../kicad";
+import { BUILTIN_REFERENCE } from "../../kicad";
 
 export enum AttachmentType {
   FILE,

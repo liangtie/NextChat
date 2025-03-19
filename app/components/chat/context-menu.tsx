@@ -98,13 +98,6 @@ export function ContextMenu({
   ]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Focus on menu when it opens
-  useEffect(() => {
-    if (menuRef.current) {
-      menuRef.current.focus();
-    }
-  }, []);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -170,6 +163,16 @@ export function ContextMenu({
             item.path?.toLowerCase().includes(searchTerm.toLowerCase()),
         )
       : currentItems;
+
+  // Focus on menu when it opens
+  useEffect(() => {
+    if (menuRef.current) {
+      menuRef.current.focus();
+    }
+    if (filteredItems.length > 0) {
+      setSelectedIndex(0); // Focus on the first item when the menu opens
+    }
+  }, [filteredItems]);
 
   const style = position
     ? {

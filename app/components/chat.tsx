@@ -31,12 +31,9 @@ import {
   copyToClipboard,
   getMessageImages,
   getMessageTextContent,
-  isVisionModel,
   safeLocalStorage,
   useMobileScreen,
 } from "../utils";
-
-import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
 
 import dynamic from "next/dynamic";
 
@@ -54,7 +51,7 @@ import {
 } from "../constant";
 import { Avatar } from "./emoji";
 import { MaskAvatar } from "./mask";
-import { ChatCommandPrefix, useChatCommand } from "../command";
+import { ChatCommandPrefix } from "../command";
 import { prettyObject } from "../utils/format";
 
 import { isEmpty } from "lodash-es";
@@ -239,7 +236,6 @@ function _Chat() {
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
   const [attachImages, setAttachImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
 
   // auto grow input
   const [inputRows, setInputRows] = useState(2);
@@ -262,31 +258,9 @@ function _Chat() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(measure, [userInput]);
 
-  // chat commands shortcuts
-  const chatCommands = useChatCommand({
-    new: () => chatStore.newSession(),
-    newm: () => navigate(Path.NewChat),
-    prev: () => chatStore.nextSession(-1),
-    next: () => chatStore.nextSession(1),
-    clear: () =>
-      chatStore.updateTargetSession(
-        session,
-        (session) => (session.clearContextIndex = session.messages.length),
-      ),
-    fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
-  });
-
-  // only search prompts when user input is short
-
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
-    const matchCommand = chatCommands.match(userInput);
-    if (matchCommand.matched) {
-      setUserInput("");
-      matchCommand.invoke();
-      return;
-    }
+
     setIsLoading(true);
     chatStore
       .onUserInput(userInput, attachImages)

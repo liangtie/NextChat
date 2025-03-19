@@ -42,245 +42,6 @@
   }
 }
 
-.chat-input-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 5px;
-
-  &-end {
-    display: flex;
-    margin-left: auto;
-    gap: 5px;
-  }
-
-  .chat-input-action {
-    display: inline-flex;
-    border-radius: 20px;
-    font-size: 12px;
-    background-color: var(--white);
-    color: var(--black);
-    border: var(--border-in-light);
-    padding: 4px 10px;
-    animation: slide-in ease 0.3s;
-    box-shadow: var(--card-shadow);
-    transition: width ease 0.3s;
-    align-items: center;
-    height: 16px;
-    width: var(--icon-width);
-    overflow: hidden;
-
-    .text {
-      white-space: nowrap;
-      padding-left: 5px;
-      opacity: 0;
-      transform: translateX(-5px);
-      transition: all ease 0.3s;
-      pointer-events: none;
-    }
-
-    &:hover {
-      --delay: 0.5s;
-      width: var(--full-width);
-      transition-delay: var(--delay);
-
-      .text {
-        transition-delay: var(--delay);
-        opacity: 1;
-        transform: translate(0);
-      }
-    }
-
-    .text,
-    .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-}
-
-.prompt-toast {
-  position: absolute;
-  bottom: -50px;
-  z-index: 999;
-  display: flex;
-  justify-content: center;
-  width: calc(100% - 40px);
-
-  .prompt-toast-inner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    background-color: var(--white);
-    color: var(--black);
-
-    border: var(--border-in-light);
-    box-shadow: var(--card-shadow);
-    padding: 10px 20px;
-    border-radius: 100px;
-
-    animation: slide-in-from-top ease 0.3s;
-
-    .prompt-toast-content {
-      margin-left: 10px;
-    }
-  }
-}
-
-.section-title {
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .section-title-action {
-    display: flex;
-    align-items: center;
-  }
-}
-
-.context-prompt {
-  .context-prompt-insert {
-    display: flex;
-    justify-content: center;
-    padding: 4px;
-    opacity: 0.2;
-    transition: all ease 0.3s;
-    background-color: rgba(0, 0, 0, 0);
-    cursor: pointer;
-    border-radius: 4px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-
-    &:hover {
-      opacity: 1;
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  .context-prompt-row {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-
-    &:hover {
-      .context-drag {
-        opacity: 1;
-      }
-    }
-
-    .context-drag {
-      display: flex;
-      align-items: center;
-      opacity: 0.5;
-      transition: all ease 0.3s;
-    }
-
-    .context-role {
-      margin-right: 10px;
-    }
-
-    .context-content {
-      flex: 1;
-      max-width: 100%;
-      text-align: left;
-    }
-
-    .context-delete-button {
-      margin-left: 10px;
-    }
-  }
-
-  .context-prompt-button {
-    flex: 1;
-  }
-}
-
-.memory-prompt {
-  margin: 20px 0;
-
-  .memory-prompt-content {
-    background-color: var(--white);
-    color: var(--black);
-    border: var(--border-in-light);
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 12px;
-    user-select: text;
-  }
-}
-
-.clear-context {
-  margin: 20px 0 0 0;
-  padding: 4px 0;
-
-  border-top: var(--border-in-light);
-  border-bottom: var(--border-in-light);
-  box-shadow: var(--card-shadow) inset;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  color: var(--black);
-  transition: all ease 0.3s;
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-  font-size: 12px;
-
-  animation: slide-in ease 0.3s;
-
-  $linear: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 1),
-    rgba(0, 0, 0, 0)
-  );
-  mask-image: $linear;
-
-  @mixin show {
-    transform: translateY(0);
-    position: relative;
-    transition: all ease 0.3s;
-    opacity: 1;
-  }
-
-  @mixin hide {
-    transform: translateY(-50%);
-    position: absolute;
-    transition: all ease 0.1s;
-    opacity: 0;
-  }
-
-  &-tips {
-    @include show;
-    opacity: 0.5;
-  }
-
-  &-revert-btn {
-    color: var(--primary);
-    @include hide;
-  }
-
-  &:hover {
-    opacity: 1;
-    border-color: var(--primary);
-
-    .clear-context-tips {
-      @include hide;
-    }
-
-    .clear-context-revert-btn {
-      @include show;
-    }
-  }
-}
-
 .chat {
   display: flex;
   flex-direction: column;
@@ -379,7 +140,7 @@
   }
 }
 
-.chat-message-user > .chat-message-container {
+.chat-message-user>.chat-message-container {
   align-items: flex-end;
 }
 
@@ -424,9 +185,11 @@
   color: #aaa;
   line-height: 1.5;
   margin-top: 5px;
+
   .chat-message-tool {
     display: flex;
     align-items: end;
+
     svg {
       margin-left: 5px;
       margin-right: 5px;
@@ -463,8 +226,10 @@
   user-select: text;
   word-break: break-word;
   box-sizing: border-box;
+
   audio {
-    height: 30px; /* 调整高度 */
+    height: 30px;
+    /* 调整高度 */
   }
 }
 
@@ -510,13 +275,8 @@
 }
 
 @media screen and (min-width: 600px) {
-  $max-image-width: calc(
-    calc(1200px - var(--sidebar-width)) / 3 * 2 / var(--image-count)
-  );
-  $image-width: calc(
-    calc(var(--window-width) - var(--sidebar-width)) / 3 * 2 /
-      var(--image-count)
-  );
+  $max-image-width: calc(calc(1200px - var(--sidebar-width)) / 3 * 2 / var(--image-count));
+  $image-width: calc(calc(var(--window-width) - var(--sidebar-width)) / 3 * 2 / var(--image-count));
 
   .chat-message-item-image-multi {
     width: $image-width;
@@ -544,7 +304,7 @@
   z-index: 1;
 }
 
-.chat-message-user > .chat-message-container > .chat-message-item {
+.chat-message-user>.chat-message-container>.chat-message-item {
   background-color: var(--second);
 
   &:hover {
@@ -655,8 +415,7 @@
   min-height: 68px;
 }
 
-.chat-input:focus {
-}
+.chat-input:focus {}
 
 .chat-input-send {
   background-color: var(--primary);
@@ -731,6 +490,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+
   .chat-body-container {
     height: 100%;
     display: flex;
@@ -738,6 +498,7 @@
     flex: 1;
     width: 100%;
   }
+
   .chat-side-panel {
     position: absolute;
     inset: 0;
@@ -746,6 +507,7 @@
     z-index: 10;
     transform: translateX(100%);
     transition: all ease 0.3s;
+
     &-show {
       transform: translateX(0);
     }

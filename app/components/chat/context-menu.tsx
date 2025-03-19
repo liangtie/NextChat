@@ -37,7 +37,7 @@ export type ContextMenuItem =
 interface Props {
   items?: ContextMenuItem[];
   onSelect?: (item: ContextMenuItem) => void;
-  onClose?: () => void;
+  onClose?: (event?: React.KeyboardEvent<HTMLDivElement>) => void;
   position?: { x: number; y: number };
   searchTerm?: string;
   onSearchChange?: (term: string) => void;
@@ -155,6 +155,9 @@ export function ContextMenu({
         onClose?.();
         break;
       default:
+        if (!showSearch) {
+          onClose?.(event);
+        }
         break;
     }
   };

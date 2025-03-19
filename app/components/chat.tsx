@@ -148,7 +148,8 @@ function _Chat() {
           : [],
       )
       .concat(
-        userInput.length > 0 && config.sendPreviewBubble
+        // NOTE preview user input seems not useful
+        userInput.length > 0 && false
           ? [
               {
                 ...createMessage({

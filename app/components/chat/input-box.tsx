@@ -127,13 +127,13 @@ export function InputBox({
     if (!inputRef.current) return;
 
     const cursorPosition = inputRef.current.selectionStart || 0;
-    const lastChar = text[cursorPosition - 1] || ""; // Current cursor
+    const lastChar = text[cursorPosition - 1] || ""; // Current cursor character
 
     if (lastChar === "@") {
       const editorRect = inputRef.current.getBoundingClientRect();
-      const menuWidth = 400;
+      const menuWidth = 400; // Approximate width of the context menu
 
-      // Create a temporary span to measure text width
+      // Create a hidden span to measure the text width before "@"
       const tempSpan = document.createElement("span");
       tempSpan.style.visibility = "hidden";
       tempSpan.style.whiteSpace = "pre";
@@ -144,11 +144,17 @@ export function InputBox({
       const textWidth = tempSpan.offsetWidth;
       document.body.removeChild(tempSpan);
 
-      const x = Math.min(
-        editorRect.left + textWidth,
-        window.innerWidth - menuWidth,
-      );
-      const y = editorRect.bottom + 5; // Small offset to position below text
+      let x = editorRect.left + textWidth + 8; // Aligns slightly right of "@"
+      let y = editorRect.top + inputRef.current.scrollHeight - 5; // Positions below text input
+
+      // Prevent menu from overflowing the viewport
+      if (x + menuWidth > window.innerWidth) {
+        x = window.innerWidth - menuWidth - 10;
+      }
+
+      // Ensure a minimum margin
+      x = Math.max(10, x);
+      y = Math.min(y, window.innerHeight - 50); // Prevents bottom overflow
 
       setContextMenuPosition({ x, y });
       setShowContextMenu(true);
@@ -291,8 +297,13 @@ export function InputBox({
     }
   };
 
-  const onCtxMenuClose = () => {
-    setTimeout(() => inputRef.current?.focus(), 0);
+  const onCtxMenuClose = (event?: React.KeyboardEvent<HTMLDivElement>) => {
+    setTimeout(() => {
+      inputRef.current?.focus();
+      if (event) {
+        inputRef.current?.dispatchEvent(event.nativeEvent);
+      }
+    }, 0);
   };
 
   return (

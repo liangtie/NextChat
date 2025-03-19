@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, ReactNode } from "react";
+import { useRef, useState, useEffect } from "react";
 import Locale from "../../locales";
 import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
@@ -16,7 +16,6 @@ import {
   CMD_TYPE,
   CONTEXT_MENU_CMD,
   DESIGN_GLOBAL_CONTEXT,
-  GENERIC_CHAT_CMD,
   READABLE_CMD,
 } from "../../kicad";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../kicad/constant";
@@ -25,7 +24,7 @@ import {
   KICAD_DESKTOP_CMD_TYPE,
 } from "../../kicad/cmd/kicad_desktop";
 import clsx from "clsx";
-import { DeleteImageButton, useSubmitHandler } from "./chat-utils";
+import { useSubmitHandler } from "./chat-utils";
 import { autoGrowTextArea, useMobileScreen } from "@/app/utils";
 import {
   ChatMessage,
@@ -39,7 +38,6 @@ import { Path } from "@/app/constant";
 import { websocketClient } from "@/app/websocket";
 import { useNavigate } from "react-router-dom";
 import { isEmpty } from "lodash-es";
-import { ChatCommandPrefix } from "@/app/command";
 
 interface InputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -110,8 +108,13 @@ export function InputBox({
     });
   };
 
-  // remember unfinished input
   useEffect(() => {
+    window[WEBVIEW_FUNCTIONS.update_global_ctx] = (
+      ctx: DESIGN_GLOBAL_CONTEXT,
+    ) => {
+      (global_ctx.current as DESIGN_GLOBAL_CONTEXT | null) = ctx;
+    };
+
     window[WEBVIEW_FUNCTIONS.fire_copilot_cmd] = (cmd: CONTEXT_MENU_CMD) => {
       navigate(Path.Chat);
       process_cmd(cmd);

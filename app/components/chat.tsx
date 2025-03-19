@@ -36,7 +36,6 @@ import {
 } from "../constant";
 import { Avatar } from "./emoji";
 import { MaskAvatar } from "./mask";
-import { ChatCommandPrefix } from "../command";
 import { prettyObject } from "../utils/format";
 
 import { RealtimeChat } from "@/app/components/realtime-chat";
@@ -64,7 +63,6 @@ function _Chat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { submitKey, shouldSubmit } = useSubmitHandler();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // if user is typing, should auto scroll to bottom

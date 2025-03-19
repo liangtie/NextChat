@@ -7,6 +7,27 @@
   overflow: hidden;
 }
 
+.chat-input-panel {
+  cursor: text;
+  position: relative;
+  width: 100%;
+  border: var(--border-in-light);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--ansiBlack);
+
+  :global(.button-container) {
+    position: absolute;
+    right: 30px;
+    bottom: 32px;
+  }
+}
+
+.chat-input-panel :has(.chat-input:focus) {
+  border: 1px solid var(--primary);
+}
+
 .input-header {
   padding: 4px 4px;
   background-color: var(--vscode-editor-background);
@@ -132,20 +153,4 @@
   .chat-input {
     font-size: 16px;
   }
-}
-
-.chat-input-panel-inner {
-  cursor: text;
-  display: flex;
-  flex: 1;
-  border-radius: 10px;
-  border: var(--border-in-light);
-}
-
-.chat-input-panel-inner-attach {
-  padding-bottom: 80px;
-}
-
-.chat-input-panel-inner:has(.chat-input:focus) {
-  border: 1px solid var(--primary);
 }

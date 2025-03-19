@@ -307,29 +307,24 @@ export function InputBox({
   };
 
   return (
-    <div className={styles["full-input-box"]}>
-      <div className={styles["input-header"]}>
-        <div className={styles["attached-files"]}>
-          <SelectContextButton onContextSelect={handleContextSelect} />
-          {attachedItems.map((item, index) => (
-            <div key={index} className={styles["file-pill"]}>
-              <span>{item.data.name}</span>
-              <button
-                onClick={() => removeAttachedItem(index)}
-                className={styles["remove-file"]}
-              >
-                ×
-              </button>
-            </div>
-          ))}
+    <div className={styles["chat-input-panel"]}>
+      <div className={styles["full-input-box"]}>
+        <div className={styles["input-header"]}>
+          <div className={styles["attached-files"]}>
+            <SelectContextButton onContextSelect={handleContextSelect} />
+            {attachedItems.map((item, index) => (
+              <div key={index} className={styles["file-pill"]}>
+                <span>{item.data.name}</span>
+                <button
+                  onClick={() => removeAttachedItem(index)}
+                  className={styles["remove-file"]}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      <label
-        className={clsx(styles["chat-input-panel-inner"], {
-          [styles["chat-input-panel-inner-attach"]]: attachImages.length !== 0,
-        })}
-        htmlFor="chat-input"
-      >
         <textarea
           id="chat-input"
           ref={inputRef}
@@ -347,28 +342,28 @@ export function InputBox({
             fontFamily: config.fontFamily,
           }}
         />
-      </label>{" "}
-      {showContextMenu && contextMenuPosition && (
-        <ContextMenu
-          onSelect={(item) => {
-            handleContextSelect(item);
-            setShowContextMenu(false);
-          }}
-          onClose={() => {
-            setShowContextMenu(false);
-            onCtxMenuClose();
-          }}
-          position={contextMenuPosition}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          anchorPoint="bottom"
-          showSearch={false}
-        />
-      )}
-      <div className={styles["input-footer"]}>
-        <div className={styles["action-buttons"]}>
-          <SelectAttachmentButton onFileSelect={handleFileSelect} />
-          <SendButton onClick={doSubmit} />
+        {showContextMenu && contextMenuPosition && (
+          <ContextMenu
+            onSelect={(item) => {
+              handleContextSelect(item);
+              setShowContextMenu(false);
+            }}
+            onClose={() => {
+              setShowContextMenu(false);
+              onCtxMenuClose();
+            }}
+            position={contextMenuPosition}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            anchorPoint="bottom"
+            showSearch={false}
+          />
+        )}
+        <div className={styles["input-footer"]}>
+          <div className={styles["action-buttons"]}>
+            <SelectAttachmentButton onFileSelect={handleFileSelect} />
+            <SendButton onClick={doSubmit} />
+          </div>
         </div>
       </div>
     </div>

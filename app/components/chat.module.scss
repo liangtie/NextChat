@@ -270,21 +270,13 @@
   }
 }
 
-.chat-input-panel {
+.chat-input-box-container {
   position: relative;
   width: 100%;
-  padding: 20px;
-  padding-top: 10px;
   box-sizing: border-box;
-  flex-direction: column;
-  border-top: var(--border-in-light);
-  box-shadow: var(--card-shadow);
-
-  .chat-input-actions {
-    .chat-input-action {
-      margin-bottom: 10px;
-    }
-  }
+  background-color: var(--gray);
+  padding: var(--chat-padding);
+  border: none;
 }
 
 @mixin single-line {
@@ -340,7 +332,6 @@
     }
   }
 }
-
 
 
 .chat-main {

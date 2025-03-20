@@ -23,7 +23,6 @@ import {
   fire_kicad_desktop_cmd,
   KICAD_DESKTOP_CMD_TYPE,
 } from "../../kicad/cmd/kicad_desktop";
-import clsx from "clsx";
 import { useSubmitHandler } from "./chat-utils";
 import { autoGrowTextArea, useMobileScreen } from "@/app/utils";
 import {
@@ -47,6 +46,18 @@ interface InputBoxProps {
   setAutoScroll: (value: boolean) => void;
 }
 
+let global_ctx: DESIGN_GLOBAL_CONTEXT | null = null;
+
+window[WEBVIEW_FUNCTIONS.update_global_ctx] = (ctx: DESIGN_GLOBAL_CONTEXT) => {
+  global_ctx = ctx;
+};
+
+window.onfocus = () => {
+  fire_kicad_desktop_cmd({
+    type: KICAD_DESKTOP_CMD_TYPE.update_global_context,
+  });
+};
+
 export function InputBox({
   inputRef,
   userInput,
@@ -56,7 +67,6 @@ export function InputBox({
 }: InputBoxProps) {
   const chatStore = useChatStore();
   const [refs, setRefs] = useState(new Set<BUILTIN_REFERENCE>());
-  const global_ctx = useRef<DESIGN_GLOBAL_CONTEXT>(null);
   const [attachedItems, setAttachedItems] = useState<AttachmentItem[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
@@ -109,12 +119,6 @@ export function InputBox({
   };
 
   useEffect(() => {
-    window[WEBVIEW_FUNCTIONS.update_global_ctx] = (
-      ctx: DESIGN_GLOBAL_CONTEXT,
-    ) => {
-      (global_ctx.current as DESIGN_GLOBAL_CONTEXT | null) = ctx;
-    };
-
     window[WEBVIEW_FUNCTIONS.fire_copilot_cmd] = (cmd: CONTEXT_MENU_CMD) => {
       navigate(Path.Chat);
       process_cmd(cmd);
@@ -177,8 +181,8 @@ export function InputBox({
           },
         },
       },
-      global_context_uuid: global_ctx.current?.uuid || undefined,
-      design_global_context: global_ctx.current ?? undefined,
+      global_context_uuid: global_ctx?.uuid || undefined,
+      design_global_context: global_ctx ?? undefined,
     });
 
     setAttachImages([]);
@@ -247,9 +251,6 @@ export function InputBox({
         const it = item.opt;
         if (!refs.has(it)) {
           setRefs(new Set([...refs, it]));
-          fire_kicad_desktop_cmd({
-            type: KICAD_DESKTOP_CMD_TYPE.update_global_context,
-          });
           setAttachedItems([
             ...attachedItems,
             {

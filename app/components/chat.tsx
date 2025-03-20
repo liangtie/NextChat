@@ -47,7 +47,6 @@ import {
   ChatAction,
   Markdown,
   useScrollToBottom,
-  useSubmitHandler,
 } from "./chat/chat-utils";
 import { InputBox } from "./chat/input-box";
 import { WelcomePage } from "./chat/welcome-page";

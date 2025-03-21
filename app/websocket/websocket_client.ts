@@ -1,8 +1,9 @@
 import { CHAT_CMD } from "../kicad";
 import { get_runtime_websocket_url } from "./websocket_cnf";
 import {
+  WEBSOCKET_RESPONSE,
   WEBSOCKET_RESPONSE_TYPE,
-  WEBSOCKET_CHAT_RESPONSE,
+  WEBSOCKET_STREAMING_RESPONSE,
 } from "./websocket_response";
 
 export interface WEBSOCKET_CMD_OPTION {
@@ -48,9 +49,9 @@ class WebSocketStream {
 
   public onmessage(msg: MessageEvent) {
     try {
-      const res = JSON.parse(msg.data) as WEBSOCKET_CHAT_RESPONSE;
+      const res = JSON.parse(msg.data) as WEBSOCKET_RESPONSE;
       switch (res.type) {
-        case WEBSOCKET_RESPONSE_TYPE.CHAT_END:
+        case WEBSOCKET_RESPONSE_TYPE.CHAT_STREAMING_END:
           this.finished = true;
           break;
         case WEBSOCKET_RESPONSE_TYPE.CHAT_STREAMING:

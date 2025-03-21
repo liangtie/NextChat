@@ -15,7 +15,7 @@ import {
   CHAT_CMD,
   CMD_TYPE,
   CONTEXT_MENU_CMD,
-  DESIGN_GLOBAL_CONTEXT,
+  COPILOT_GLOBAL_CONTEXT,
   READABLE_CMD,
 } from "../../copilot";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
@@ -46,9 +46,9 @@ interface InputBoxProps {
   setAutoScroll: (value: boolean) => void;
 }
 
-let global_ctx: DESIGN_GLOBAL_CONTEXT | null = null;
+let global_ctx: COPILOT_GLOBAL_CONTEXT | null = null;
 
-window[WEBVIEW_FUNCTIONS.update_global_ctx] = (ctx: DESIGN_GLOBAL_CONTEXT) => {
+window[WEBVIEW_FUNCTIONS.update_global_ctx] = (ctx: COPILOT_GLOBAL_CONTEXT) => {
   global_ctx = ctx;
 };
 

@@ -1,8 +1,3 @@
-export interface AgentCMD {
-  action: string;
-  context?: unknown;
-}
-
 export enum WEBSOCKET_RESPONSE_TYPE {
   CHAT_STREAMING = 1,
   CHAT_STREAMING_END = 2,
@@ -22,7 +17,15 @@ export interface WEBSOCKET_DEBUG_RESPONSE {
   msg: string;
 }
 
-export interface WEBSOCKET_AGENT_RESPONSE extends AgentCMD {
+/**
+ * Function call replied by the AI, used to involve a rpc call or launch python/js script
+ */
+export interface AGENT_REQUEST {
+  action: string;
+  context?: unknown;
+}
+
+export interface WEBSOCKET_AGENT_RESPONSE extends AGENT_REQUEST {
   type: WEBSOCKET_RESPONSE_TYPE.AGENT;
 }
 

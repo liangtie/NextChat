@@ -30,8 +30,3 @@ export interface DESIGN_GLOBAL_CONTEXT {
   project_context: PROJECT_CONTEXT;
   traits: DESIGN_GLOBAL_CONTEXT_TRAITS;
 }
-
-export interface SYMBOL_CMD_CONTEXT {
-  designator: string;
-  symbol_properties: unknown;
-}

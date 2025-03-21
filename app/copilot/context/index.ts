@@ -1,2 +1,3 @@
 export * from "./generic_chat";
-export * from "./copilot_context";
+export * from "./design_global_ctx";
+export * from "./symbol_ctx";

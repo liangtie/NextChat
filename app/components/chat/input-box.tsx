@@ -17,12 +17,12 @@ import {
   CONTEXT_MENU_CMD,
   DESIGN_GLOBAL_CONTEXT,
   READABLE_CMD,
-} from "../../kicad";
-import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../kicad/constant";
+} from "../../copilot";
+import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
 import {
   fire_kicad_desktop_cmd,
   KICAD_DESKTOP_CMD_TYPE,
-} from "../../kicad/cmd/kicad_desktop";
+} from "../../copilot/cmd/kicad_desktop";
 import { useSubmitHandler } from "./chat-utils";
 import { autoGrowTextArea, useMobileScreen } from "@/app/utils";
 import {

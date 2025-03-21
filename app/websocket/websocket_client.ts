@@ -1,4 +1,4 @@
-import { CHAT_CMD } from "../kicad";
+import { CHAT_CMD } from "../copilot";
 import { get_runtime_websocket_url } from "./websocket_cnf";
 import {
   WEBSOCKET_RESPONSE,

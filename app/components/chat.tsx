@@ -40,14 +40,10 @@ import { prettyObject } from "../utils/format";
 
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
-import { CONTEXT_MENU_CMD, READABLE_CMD } from "../kicad";
-import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../kicad/constant";
+import { CONTEXT_MENU_CMD, READABLE_CMD } from "../copilot";
+import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../copilot/constant";
 import { websocketClient } from "../websocket";
-import {
-  ChatAction,
-  Markdown,
-  useScrollToBottom,
-} from "./chat/chat-utils";
+import { ChatAction, Markdown, useScrollToBottom } from "./chat/chat-utils";
 import { InputBox } from "./chat/input-box";
 import { WelcomePage } from "./chat/welcome-page";
 

@@ -5,7 +5,7 @@ import BookIcon from "../../icons/book.svg";
 import BomIcon from "../../icons/eda/bom.svg";
 import GlobeIcon from "../../icons/globe.svg";
 import NetlistIcon from "../../icons/eda/graph.svg";
-import { BUILTIN_REFERENCE } from "../../kicad";
+import { BUILTIN_REFERENCE } from "../../copilot";
 
 export interface ContextMenuItemBase {
   id: string;

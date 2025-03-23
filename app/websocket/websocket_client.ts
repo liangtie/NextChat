@@ -1,4 +1,5 @@
 import { CHAT_CMD } from "../copilot";
+import { WEBVIEW_MSG_HANDLES } from "../copilot/constant";
 import { get_runtime_websocket_url } from "./websocket_cnf";
 import {
   WEBSOCKET_RESPONSE,
@@ -50,6 +51,7 @@ class WebSocketStream {
   public onmessage(msg: MessageEvent) {
     try {
       const res = JSON.parse(msg.data) as WEBSOCKET_RESPONSE;
+      console.log("[Websocket] agent request", res);
       switch (res.type) {
         case WEBSOCKET_RESPONSE_TYPE.CHAT_STREAMING_END:
           this.finished = true;
@@ -61,6 +63,11 @@ class WebSocketStream {
           this.remainText += "### Prompt:\n";
           this.remainText += res.msg;
           this.remainText += "\n";
+          break;
+        case WEBSOCKET_RESPONSE_TYPE.AGENT:
+          window[WEBVIEW_MSG_HANDLES.function_call].postMessage(
+            JSON.stringify(res),
+          );
           break;
       }
     } catch (e) {

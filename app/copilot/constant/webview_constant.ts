@@ -1,5 +1,6 @@
 export enum WEBVIEW_MSG_HANDLES {
   kicad_desktop = "kicad_desktop",
+  function_call = "function_call",
 }
 
 export enum WEBVIEW_FUNCTIONS {

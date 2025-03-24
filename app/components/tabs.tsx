@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styles from "./tabs.module.scss";
 import { Chat } from "./chat";
 import Locale from "../locales";
+import { Component } from "./component";
+import { Module } from "./module";
 
 export const Tabs = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -10,9 +12,9 @@ export const Tabs = () => {
     { title: Locale.Chat.Tabs.Chat, content: <Chat /> },
     {
       title: Locale.Chat.Tabs.Component,
-      content: <div>Content for Tab 2</div>,
+      content: <Component />,
     },
-    { title: Locale.Chat.Tabs.Module, content: <div>Content for Tab 3</div> },
+    { title: Locale.Chat.Tabs.Module, content: <Module /> },
   ];
 
   return (

@@ -537,3 +537,5 @@ export function Chat() {
 
   return <_Chat key={session.id}></_Chat>;
 }
+
+export default Chat;

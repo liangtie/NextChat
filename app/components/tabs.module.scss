@@ -9,6 +9,7 @@
   display: flex;
   border-bottom: 1px solid var(--gray);
   background-color: var(--white);
+  justify-content: space-between;
 }
 
 .tab {
@@ -17,6 +18,7 @@
   text-align: center;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  border-bottom: 1px solid var(--gray);
 
   &:hover {
     background-color: var(--light-gray);
@@ -24,7 +26,7 @@
 
   &.active {
     font-weight: bold;
-    border-bottom: 2px solid var(--primary);
+    border-bottom: 3px solid var(--primary);
   }
 }
 

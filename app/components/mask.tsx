@@ -36,7 +36,7 @@ import { Avatar, AvatarPicker } from "./emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
 
-import chatStyle from "./chat.module.scss";
+import chatStyle from "./chat/chat.module.scss";
 import { useState } from "react";
 import {
   copyToClipboard,

@@ -1,29 +1,29 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
-import CopyIcon from "../icons/copy.svg";
-import LoadingButtonIcon from "../icons/loading.svg";
-import DeleteIcon from "../icons/clear.svg";
-import PinIcon from "../icons/pin.svg";
-import ConfirmIcon from "../icons/confirm.svg";
-import CloseIcon from "../icons/close.svg";
+import CopyIcon from "../../icons/copy.svg";
+import LoadingButtonIcon from "../../icons/loading.svg";
+import DeleteIcon from "../../icons/clear.svg";
+import PinIcon from "../../icons/pin.svg";
+import ConfirmIcon from "../../icons/confirm.svg";
+import CloseIcon from "../../icons/close.svg";
 
-import StopIcon from "../icons/pause.svg";
+import StopIcon from "../../icons/pause.svg";
 import {
   ChatMessage,
   createMessage,
   useAppConfig,
   useChatStore,
-} from "../store";
+} from "../../store";
 
 import {
   copyToClipboard,
   getMessageImages,
   getMessageTextContent,
   useMobileScreen,
-} from "../utils";
+} from "../../utils";
 
-import { ChatControllerPool } from "../client/controller";
-import Locale from "../locales";
+import { ChatControllerPool } from "../../client/controller";
+import Locale from "../../locales";
 
 import styles from "./chat.module.scss";
 
@@ -33,19 +33,19 @@ import {
   Path,
   REQUEST_TIMEOUT_MS,
   UNFINISHED_INPUT,
-} from "../constant";
-import { Avatar } from "./emoji";
-import { MaskAvatar } from "./mask";
-import { prettyObject } from "../utils/format";
+} from "../../constant";
+import { Avatar } from "../emoji";
+import { MaskAvatar } from "../mask";
+import { prettyObject } from "../../utils/format";
 
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
-import { CONTEXT_MENU_CMD, READABLE_CMD } from "../copilot";
-import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../copilot/constant";
-import { websocketClient } from "../websocket";
-import { ChatAction, Markdown, useScrollToBottom } from "./chat/chat-utils";
-import { InputBox } from "./chat/input-box";
-import { WelcomePage } from "./chat/welcome-page";
+import { CONTEXT_MENU_CMD, READABLE_CMD } from "../../copilot";
+import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
+import { websocketClient } from "../../websocket";
+import { ChatAction, Markdown, useScrollToBottom } from "./chat-utils";
+import { InputBox } from "./input-box";
+import { WelcomePage } from "./welcome-page";
 
 function _Chat() {
   type RenderMessage = ChatMessage & { preview?: boolean };

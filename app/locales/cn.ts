@@ -34,6 +34,11 @@ const cn = {
   },
   Chat: {
     SubTitle: (count: number) => `共 ${count} 条对话`,
+    Tabs: {
+      Chat: "对话",
+      Component: "器件",
+      Module: "模块",
+    },
     EditMessage: {
       Title: "编辑消息记录",
       Topic: {

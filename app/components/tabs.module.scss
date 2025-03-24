@@ -1,0 +1,35 @@
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 1px solid var(--gray);
+  background-color: var(--white);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: var(--light-gray);
+  }
+
+  &.active {
+    font-weight: bold;
+    border-bottom: 2px solid var(--primary);
+  }
+}
+
+.tabs-content {
+  flex: 1;
+  overflow: auto;
+  background-color: var(--gray);
+}

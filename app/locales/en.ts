@@ -35,6 +35,11 @@ const en: LocaleType = {
   },
   Chat: {
     SubTitle: (count: number) => `${count} messages`,
+    Tabs: {
+      Chat: "Chat",
+      Component: "Component",
+      Module: "Module",
+    },
     EditMessage: {
       Title: "Edit All Messages",
       Topic: {

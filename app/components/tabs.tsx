@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./tabs.module.scss";
-import { Chat } from "./chat/chat";
+import { Chat } from "./chat";
 import Locale from "../locales";
 
 export const Tabs = () => {

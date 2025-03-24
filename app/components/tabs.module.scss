@@ -18,7 +18,8 @@
   text-align: center;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  border-bottom: 0.5px solid var(--gray);
+  border-bottom: 1px solid var(--gray);
+  margin-bottom: 5px;
 
   &:hover {
     background-color: var(--light-gray);
@@ -26,7 +27,7 @@
 
   &.active {
     font-weight: bold;
-    border-bottom: 0.5px solid var(--primary);
+    border-bottom: 1px solid var(--primary);
   }
 }
 

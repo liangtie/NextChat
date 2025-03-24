@@ -35,7 +35,7 @@ const cn = {
   Chat: {
     SubTitle: (count: number) => `共 ${count} 条对话`,
     Tabs: {
-      Chat: "对话",
+      Chat: "聊天",
       Component: "器件",
       Module: "模块",
     },

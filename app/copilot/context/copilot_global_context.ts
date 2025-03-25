@@ -1,17 +1,9 @@
-export interface PROJECT_FILE {
-  name: string;
-  ext: string;
-  path: string;
-}
-
-export interface PROJECT_CONTEXT {
-  project_name: string;
-  project_path: string;
-  files: PROJECT_FILE[];
-}
+import { HOST_VERSION_INFO } from "./host_version_info";
 
 export interface COPILOT_GLOBAL_CONTEXT {
   uuid: string;
-  kicad_version_info: unknown;
-  project_context: PROJECT_CONTEXT;
+  /**
+   * @description The version of the host application, e.g. KiCad, Altium, etc.
+   */
+  host_version_info?: HOST_VERSION_INFO;
 }

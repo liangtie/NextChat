@@ -4,7 +4,6 @@ import { get_runtime_websocket_url } from "./websocket_cnf";
 import {
   WEBSOCKET_RESPONSE,
   WEBSOCKET_RESPONSE_TYPE,
-  WEBSOCKET_STREAMING_RESPONSE,
 } from "./websocket_response";
 
 export interface WEBSOCKET_CMD_OPTION {
@@ -60,9 +59,11 @@ class WebSocketStream {
           this.remainText += res.msg;
           break;
         case WEBSOCKET_RESPONSE_TYPE.DEBUG:
-          this.remainText += "### Prompt:\n";
-          this.remainText += res.msg;
-          this.remainText += "\n";
+          if (res.msg) {
+            this.remainText += "### Prompt:\n";
+            this.remainText += res.msg;
+            this.remainText += "\n";
+          }
           break;
         case WEBSOCKET_RESPONSE_TYPE.AGENT:
           window[WEBVIEW_MSG_HANDLES.function_call].postMessage(

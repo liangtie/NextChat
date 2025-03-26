@@ -43,6 +43,7 @@ class WebSocketStream {
     public remainText = "",
     public finished = false,
     public error = false,
+    private show_debug = false,
   ) {
     this.animateResponseText();
   }
@@ -59,7 +60,7 @@ class WebSocketStream {
           this.remainText += res.msg;
           break;
         case WEBSOCKET_RESPONSE_TYPE.DEBUG:
-          if (res.msg) {
+          if (this.show_debug && res.msg) {
             this.remainText += "### Prompt:\n";
             this.remainText += res.msg;
             this.remainText += "\n";

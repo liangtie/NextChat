@@ -14,7 +14,7 @@ export interface WEBSOCKET_STREAMING_RESPONSE {
 
 export interface WEBSOCKET_DEBUG_RESPONSE {
   type: WEBSOCKET_RESPONSE_TYPE.DEBUG;
-  msg: string;
+  msg?: string;
 }
 
 /**

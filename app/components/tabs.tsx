@@ -3,7 +3,6 @@ import styles from "./tabs.module.scss";
 import { Chat } from "./chat";
 import Locale from "../locales";
 import { Component } from "./component";
-import { Module } from "./module";
 
 export const Tabs = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -14,7 +13,6 @@ export const Tabs = () => {
       title: Locale.Chat.Tabs.Component,
       content: <Component />,
     },
-    { title: Locale.Chat.Tabs.Module, content: <Module /> },
   ];
 
   return (

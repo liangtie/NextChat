@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Locale from "../../locales";
 import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
@@ -16,8 +16,8 @@ import {
   CMD_TYPE,
   CONTEXT_MENU_CMD,
   COPILOT_GLOBAL_CONTEXT,
+  GENERIC_CHAT_CMD,
   get_readable_cmd,
-  USR_CHAT_CMD_BASE,
 } from "../../copilot";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
 import {
@@ -83,7 +83,7 @@ export function InputBox({
       content: (() => {
         const r = get_readable_cmd(cmd.type);
         if (r) return r;
-        return (cmd as USR_CHAT_CMD_BASE).context.chat.input_text;
+        return (cmd as GENERIC_CHAT_CMD).context.chat.input_text;
       })(),
       isMcpResponse: false,
     });

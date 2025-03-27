@@ -40,7 +40,7 @@ import { prettyObject } from "../../utils/format";
 
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
-import { CONTEXT_MENU_CMD, READABLE_CMD } from "../../copilot";
+import { CONTEXT_MENU_CMD, get_readable_cmd } from "../../copilot";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
 import { websocketClient } from "../../websocket";
 import { ChatAction, Markdown, useScrollToBottom } from "./chat-utils";
@@ -226,7 +226,7 @@ function _Chat() {
 
       const userMessage: ChatMessage = createMessage({
         role: "user",
-        content: READABLE_CMD[cmd.type],
+        content: get_readable_cmd(cmd.type),
         isMcpResponse: false,
       });
 

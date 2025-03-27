@@ -20,12 +20,23 @@ export type SYMBOL_CMD_TYPE =
   | CMD_TYPE.COMPONENT_PINS_DETAILS
   | CMD_TYPE.SYMBOL_UNCONNECTED_PINS;
 
-export const READABLE_CMD = {
-  [CMD_TYPE.DESIGN_INTENTION]: "设计意图",
-  [CMD_TYPE.CORE_COMPONENTS]: "核心组件",
-  [CMD_TYPE.CURRENT_COMPONENT]: "当前组件",
-  [CMD_TYPE.SIMILAR_COMPONENTS]: "相似器件推荐",
-  [CMD_TYPE.CHECK_SYMBOL_CONNECTIONS]: "连接关系检查",
-  [CMD_TYPE.COMPONENT_PINS_DETAILS]: "引脚详情",
-  [CMD_TYPE.SYMBOL_UNCONNECTED_PINS]: "未连接引脚检查",
-};
+export function get_readable_cmd(cmd: CMD_TYPE) {
+  switch (cmd) {
+    case CMD_TYPE.DESIGN_INTENTION:
+      return "设计意图";
+    case CMD_TYPE.CORE_COMPONENTS:
+      return "核心组件";
+    case CMD_TYPE.CURRENT_COMPONENT:
+      return "当前组件";
+    case CMD_TYPE.SIMILAR_COMPONENTS:
+      return "相似器件推荐";
+    case CMD_TYPE.CHECK_SYMBOL_CONNECTIONS:
+      return "连接关系检查";
+    case CMD_TYPE.COMPONENT_PINS_DETAILS:
+      return "引脚详情";
+    case CMD_TYPE.SYMBOL_UNCONNECTED_PINS:
+      return "未连接引脚检查";
+    default:
+      return undefined;
+  }
+}

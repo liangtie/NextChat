@@ -16,7 +16,8 @@ import {
   CMD_TYPE,
   CONTEXT_MENU_CMD,
   COPILOT_GLOBAL_CONTEXT,
-  READABLE_CMD,
+  get_readable_cmd,
+  USR_CHAT_CMD_BASE,
 } from "../../copilot";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
 import {
@@ -79,10 +80,11 @@ export function InputBox({
   const process_cmd = async (cmd: CHAT_CMD) => {
     const userMessage: ChatMessage = createMessage({
       role: "user",
-      content:
-        cmd.type !== CMD_TYPE.GENERIC_CHAT
-          ? READABLE_CMD[cmd.type]
-          : cmd.context.chat.input_text,
+      content: (() => {
+        const r = get_readable_cmd(cmd.type);
+        if (r) return r;
+        return (cmd as USR_CHAT_CMD_BASE).context.chat.input_text;
+      })(),
       isMcpResponse: false,
     });
 
@@ -176,9 +178,6 @@ export function InputBox({
       context: {
         chat: {
           input_text: userInput,
-          options: {
-            builtin_refs: [...refs],
-          },
         },
       },
       global_context_uuid: global_ctx?.uuid || undefined,

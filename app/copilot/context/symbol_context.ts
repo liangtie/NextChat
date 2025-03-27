@@ -1,4 +1,4 @@
 export interface SYMBOL_CMD_CONTEXT {
   designator: string;
-  symbol_properties: unknown;
+  symbol_properties?: unknown;
 }

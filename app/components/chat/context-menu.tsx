@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
 import SymbolIcon from "../../icons/eda/symbol.svg";
 import BookIcon from "../../icons/book.svg";
@@ -91,13 +91,13 @@ export function ContextMenu({
   onSelect,
   onClose,
   position,
-  searchTerm = "",
-  onSearchChange,
   anchorPoint = "top",
   showSearch = true,
 }: Props) {
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const onSearchChange = (term: string) => setSearchTerm(term);
   const [currentItems, setCurrentItems] = useState<ContextMenuItem[]>([
     ...defaultSections(),
   ]);
@@ -171,19 +171,25 @@ export function ContextMenu({
 
   // Focus on menu when it opens
   useEffect(() => {
-    if (menuRef.current) {
+    if (menuRef.current && !showSearch) {
       menuRef.current.focus();
     }
     if (filteredItems.length > 0) {
       setSelectedIndex(0); // Focus on the first item when the menu opens
     }
-  }, [filteredItems]);
+  }, [filteredItems, showSearch]);
+
+  const maxVisibleItems = 10; // Maximum number of items to display without scrolling
+  const itemHeight = 30; // Approximate height of each menu item in pixels
+  const calculatedHeight =
+    Math.min(currentItems.length, maxVisibleItems) * itemHeight;
 
   const style = position
     ? {
         position: "fixed" as const,
         left: `${position.x}px`,
         top: `${position.y}px`,
+        height: `${calculatedHeight}px`, // Dynamically set the height
         ...(anchorPoint === "bottom" && {
           transform: "translateY(-100%)",
         }),

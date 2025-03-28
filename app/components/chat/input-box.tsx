@@ -8,8 +8,6 @@ import { ContextMenu, ContextMenuItem } from "./context-menu";
 import {
   AttachmentItem,
   AttachmentType,
-  ContextAttachmentItem,
-  FileAttachmentItem,
 } from "./context-attachment";
 import {
   BUILTIN_REFERENCE,
@@ -35,7 +33,6 @@ import { websocketClient } from "@/app/websocket";
 import { useNavigate } from "react-router-dom";
 import { isEmpty } from "lodash-es";
 import { chatGlobalContext } from "./chat-global-context";
-import { set } from "idb-keyval";
 
 interface InputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;

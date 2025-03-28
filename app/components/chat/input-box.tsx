@@ -15,15 +15,10 @@ import {
   CHAT_CMD,
   CMD_TYPE,
   CONTEXT_MENU_CMD,
-  COPILOT_GLOBAL_CONTEXT,
   GENERIC_CHAT_CMD,
   get_readable_cmd,
 } from "../../copilot";
 import { ASSISTANT_NAME, WEBVIEW_FUNCTIONS } from "../../copilot/constant";
-import {
-  fire_kicad_desktop_cmd,
-  KICAD_DESKTOP_CMD_TYPE,
-} from "../../copilot/cmd/kicad_desktop";
 import { useSubmitHandler } from "./chat-utils";
 import { autoGrowTextArea, useMobileScreen } from "@/app/utils";
 import {
@@ -38,6 +33,7 @@ import { Path } from "@/app/constant";
 import { websocketClient } from "@/app/websocket";
 import { useNavigate } from "react-router-dom";
 import { isEmpty } from "lodash-es";
+import { chatGlobalContext } from "./chat-global-context";
 
 interface InputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -46,18 +42,6 @@ interface InputBoxProps {
   setUserInput: (value: string) => void;
   setAutoScroll: (value: boolean) => void;
 }
-
-let global_ctx: COPILOT_GLOBAL_CONTEXT | null = null;
-
-window[WEBVIEW_FUNCTIONS.update_global_ctx] = (ctx: COPILOT_GLOBAL_CONTEXT) => {
-  global_ctx = ctx;
-};
-
-window.onfocus = () => {
-  fire_kicad_desktop_cmd({
-    type: KICAD_DESKTOP_CMD_TYPE.update_global_context,
-  });
-};
 
 export function InputBox({
   inputRef,
@@ -180,8 +164,8 @@ export function InputBox({
           input_text: userInput,
         },
       },
-      global_context_uuid: global_ctx?.uuid || undefined,
-      design_global_context: global_ctx ?? undefined,
+      global_context_uuid: chatGlobalContext.global_ctx?.uuid || undefined,
+      design_global_context: chatGlobalContext.global_ctx ?? undefined,
     });
 
     setAttachImages([]);

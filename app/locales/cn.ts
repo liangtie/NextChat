@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 
 const isApp = !!getClientConfig()?.isApp;
@@ -28,6 +27,12 @@ const cn = {
     SaasTips: "配置太麻烦，想要立即使用",
     TopTips:
       "🥳 ECAD Copilot AI 首发优惠，立刻解锁 OpenAI o1, GPT-4o, Claude-3.5 等最新大模型",
+  },
+  ContextMenu: {
+    Project: "项目",
+    Component: "器件",
+    Docs: "文档",
+    Web: "网页",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,

@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./context-menu.module.scss";
 import SymbolIcon from "../../icons/eda/symbol.svg";
 import BookIcon from "../../icons/book.svg";
-import BomIcon from "../../icons/eda/bom.svg";
+import ProjectIcon from "../../icons/project.svg";
 import GlobeIcon from "../../icons/globe.svg";
-import NetlistIcon from "../../icons/eda/graph.svg";
 import { BUILTIN_REFERENCE } from "../../copilot";
-
+import Locale from "../../locales";
+import { chatGlobalContext } from "./chat-global-context";
 export interface ContextMenuItemBase {
   id: string;
   name: string;
@@ -45,36 +45,42 @@ interface Props {
   showSearch?: boolean;
 }
 
-const defaultSections: ContextMenuItem[] = [
-  {
-    id: "bom",
-    name: "bom",
-    icon: <BomIcon />,
+const gen_designators_menu = (designators: string[]): ContextMenuItem[] => {
+  return designators.map((designator) => ({
+    id: designator,
+    name: designator,
     type: "option",
-    opt: BUILTIN_REFERENCE.BOM,
+    opt: BUILTIN_REFERENCE.COMPONENT,
+  }));
+};
+
+const defaultSections = (): ContextMenuItem[] => [
+  {
+    id: "project",
+    name: Locale.ContextMenu.Project,
+    icon: <ProjectIcon />,
+    type: "option",
+    opt: BUILTIN_REFERENCE.PROJECT,
   },
   {
-    id: "netlist",
-    name: "netlist",
-    icon: <NetlistIcon />,
-    type: "option",
-    opt: BUILTIN_REFERENCE.NET_LIST,
-  },
-  {
-    id: "symbol",
-    name: "symbol",
+    id: "component",
+    name: Locale.ContextMenu.Component,
     icon: <SymbolIcon />,
     type: "menu",
+    hasChildren: true,
+    children: gen_designators_menu(
+      chatGlobalContext.global_ctx?.designators ?? [],
+    ),
   },
   {
     id: "docs",
-    name: "docs",
+    name: Locale.ContextMenu.Docs,
     icon: <BookIcon />,
     type: "menu",
   },
   {
     id: "web",
-    name: "web",
+    name: Locale.ContextMenu.Web,
     icon: <GlobeIcon />,
     type: "menu",
   },
@@ -93,8 +99,7 @@ export function ContextMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [currentItems, setCurrentItems] = useState<ContextMenuItem[]>([
-    ...items,
-    ...defaultSections,
+    ...defaultSections(),
   ]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 

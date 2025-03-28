@@ -6,4 +6,6 @@ export interface COPILOT_GLOBAL_CONTEXT {
    * @description The version of the host application, e.g. KiCad, Altium, etc.
    */
   host_version_info?: HOST_VERSION_INFO;
+
+  designators?: string[];
 }

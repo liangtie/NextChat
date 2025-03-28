@@ -9,6 +9,7 @@ import {
   AttachmentItem,
   AttachmentType,
   ContextAttachmentItem,
+  FileAttachmentItem,
 } from "./context-attachment";
 import {
   BUILTIN_REFERENCE,
@@ -34,6 +35,7 @@ import { websocketClient } from "@/app/websocket";
 import { useNavigate } from "react-router-dom";
 import { isEmpty } from "lodash-es";
 import { chatGlobalContext } from "./chat-global-context";
+import { set } from "idb-keyval";
 
 interface InputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -51,9 +53,10 @@ export function InputBox({
   setAutoScroll,
 }: InputBoxProps) {
   const chatStore = useChatStore();
-  const [refs, setRefs] = useState(new Set<BUILTIN_REFERENCE>());
+  const [ctx_ref, set_ctx_ref] = useState(BUILTIN_REFERENCE.INVALID);
   const [attachedItems, setAttachedItems] = useState<AttachmentItem[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const [designator, setDesignator] = useState<string>("");
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;
     y: number;
@@ -155,18 +158,48 @@ export function InputBox({
   };
 
   const doSubmit = () => {
-    if (userInput.trim() === "" && isEmpty(attachImages)) return;
+    if (userInput.trim().length === 0 && isEmpty(attachImages)) return;
 
-    process_cmd({
-      type: CMD_TYPE.GENERIC_CHAT,
-      context: {
-        chat: {
-          input_text: userInput,
-        },
-      },
+    const global_ctx_ref = {
       global_context_uuid: chatGlobalContext.global_ctx?.uuid || undefined,
       design_global_context: chatGlobalContext.global_ctx ?? undefined,
-    });
+    };
+    switch (ctx_ref) {
+      case BUILTIN_REFERENCE.INVALID:
+        process_cmd({
+          type: CMD_TYPE.GENERIC_CHAT,
+          context: {
+            chat: {
+              input_text: userInput,
+            },
+          },
+          ...global_ctx_ref,
+        });
+        break;
+      case BUILTIN_REFERENCE.COMPONENT:
+        process_cmd({
+          type: CMD_TYPE.USR_CHAT_WITH_COMPONENT,
+          context: {
+            chat: {
+              input_text: userInput,
+            },
+            designator,
+          },
+          ...global_ctx_ref,
+        });
+        break;
+      case BUILTIN_REFERENCE.PROJECT:
+        process_cmd({
+          type: CMD_TYPE.USR_CHAT_WITH_DESIGN,
+          context: {
+            chat: {
+              input_text: userInput,
+            },
+          },
+          ...global_ctx_ref,
+        });
+        break;
+    }
 
     setAttachImages([]);
     chatStore.setLastInput(userInput);
@@ -216,11 +249,9 @@ export function InputBox({
     switch (it.type) {
       case AttachmentType.FILE:
         break;
-      case AttachmentType.CONTEXT_OPTION: {
-        const it = attachedItems[index] as ContextAttachmentItem;
-        setRefs(new Set([...refs].filter((r) => r !== it.data.opt)));
+      case AttachmentType.CONTEXT_OPTION:
+        set_ctx_ref(BUILTIN_REFERENCE.INVALID);
         break;
-      }
     }
 
     const newItems = [...attachedItems];
@@ -232,20 +263,25 @@ export function InputBox({
     switch (item.type) {
       case "option": {
         const it = item.opt;
-        if (!refs.has(it)) {
-          setRefs(new Set([...refs, it]));
-          setAttachedItems([
-            ...attachedItems,
-            {
-              type: AttachmentType.CONTEXT_OPTION,
-              data: {
-                opt: it,
-                name: item.name,
-              },
-              icon: item.icon,
+        set_ctx_ref(it);
+
+        if (it === BUILTIN_REFERENCE.COMPONENT) setDesignator(item.name);
+
+        const newItems = attachedItems.filter(
+          (it) => it.type !== AttachmentType.CONTEXT_OPTION,
+        );
+        setAttachedItems([
+          ...newItems,
+          {
+            type: AttachmentType.CONTEXT_OPTION,
+            data: {
+              opt: it,
+              name: item.name,
             },
-          ]);
-        }
+            icon: item.icon,
+          },
+        ]);
+
         break;
       }
     }

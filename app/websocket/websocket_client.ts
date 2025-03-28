@@ -51,7 +51,6 @@ class WebSocketStream {
   public onmessage(msg: MessageEvent) {
     try {
       const res = JSON.parse(msg.data) as WEBSOCKET_RESPONSE;
-      console.log("[Websocket] agent request", res);
       switch (res.type) {
         case WEBSOCKET_RESPONSE_TYPE.CHAT_STREAMING_END:
           this.finished = true;

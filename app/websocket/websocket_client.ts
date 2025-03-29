@@ -1,4 +1,8 @@
-import { CHAT_CMD } from "../copilot";
+import {
+  CHAT_CMD,
+  fire_passive_action,
+  PASSIVE_ACTION_CATEGORY,
+} from "../copilot";
 import { WEBVIEW_MSG_HANDLES } from "../copilot/constant";
 import { get_runtime_websocket_url } from "./websocket_cnf";
 import {
@@ -67,9 +71,10 @@ class WebSocketStream {
           break;
         case WEBSOCKET_RESPONSE_TYPE.AGENT:
           if (typeof window !== "undefined")
-            window[WEBVIEW_MSG_HANDLES.eda_host].postMessage(
-              JSON.stringify(res),
-            );
+            fire_passive_action({
+              category: PASSIVE_ACTION_CATEGORY.PA_AGENT,
+              action: res,
+            });
           break;
       }
     } catch (e) {

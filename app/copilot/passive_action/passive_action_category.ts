@@ -1,0 +1,5 @@
+export enum PASSIVE_ACTION_CATEGORY {
+  INVALID,
+  PA_WEB_HOST,
+  PA_AGENT,
+}

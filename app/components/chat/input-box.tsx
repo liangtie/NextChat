@@ -5,10 +5,7 @@ import { SendButton } from "./send-button";
 import { SelectAttachmentButton } from "./select-attachment-button";
 import { SelectContextButton } from "./select-context-button";
 import { ContextMenu, ContextMenuItem } from "./context-menu";
-import {
-  AttachmentItem,
-  AttachmentType,
-} from "./context-attachment";
+import { AttachmentItem, AttachmentType } from "./context-attachment";
 import {
   BUILTIN_REFERENCE,
   CHAT_CMD,
@@ -105,7 +102,9 @@ export function InputBox({
   };
 
   useEffect(() => {
-    window[WEBVIEW_FUNCTIONS.fire_copilot_cmd] = (cmd: CONTEXT_MENU_CMD) => {
+    window[WEBVIEW_FUNCTIONS.fire_host_active_cmd] = (
+      cmd: CONTEXT_MENU_CMD,
+    ) => {
       navigate(Path.Chat);
       process_cmd(cmd);
     };

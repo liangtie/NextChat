@@ -67,7 +67,7 @@ class WebSocketStream {
           break;
         case WEBSOCKET_RESPONSE_TYPE.AGENT:
           if (typeof window !== "undefined")
-            window[WEBVIEW_MSG_HANDLES.function_call].postMessage(
+            window[WEBVIEW_MSG_HANDLES.eda_host].postMessage(
               JSON.stringify(res),
             );
           break;

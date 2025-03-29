@@ -221,7 +221,9 @@ function _Chat() {
     }
     const dom = inputRef.current;
 
-    window[WEBVIEW_FUNCTIONS.fire_copilot_cmd] = (cmd: CONTEXT_MENU_CMD) => {
+    window[WEBVIEW_FUNCTIONS.fire_host_active_cmd] = (
+      cmd: CONTEXT_MENU_CMD,
+    ) => {
       navigate(Path.Chat);
 
       const userMessage: ChatMessage = createMessage({

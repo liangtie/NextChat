@@ -1,4 +1,4 @@
-import { WEBVIEW_MSG_HANDLES } from "../../constant";
+import { WEBVIEW_MSG_HANDLES } from "../constant";
 
 export enum WEB_HOST_INTERNAL_CMD_TYPE {
   fetch_global_context_from_host = "fetch_global_context_from_host",

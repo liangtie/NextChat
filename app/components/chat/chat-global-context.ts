@@ -1,8 +1,9 @@
-import { COPILOT_GLOBAL_CONTEXT } from "@/app/copilot";
 import {
   fire_web_host_internal_cmd,
   WEB_HOST_INTERNAL_CMD_TYPE,
-} from "@/app/copilot/cmd/internal";
+  COPILOT_GLOBAL_CONTEXT,
+} from "@/app/copilot";
+
 import { WEBVIEW_FUNCTIONS } from "@/app/copilot/constant";
 
 class ChatGlobalContext {

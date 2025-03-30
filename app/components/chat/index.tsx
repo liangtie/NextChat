@@ -221,49 +221,6 @@ function _Chat() {
     }
     const dom = inputRef.current;
 
-    window[WEBVIEW_FUNCTIONS.fire_host_active_cmd] = (
-      cmd: CONTEXT_MENU_CMD,
-    ) => {
-      navigate(Path.Chat);
-
-      const userMessage: ChatMessage = createMessage({
-        role: "user",
-        content: get_readable_cmd(cmd.type),
-        isMcpResponse: false,
-      });
-
-      const botMessage: ChatMessage = createMessage({
-        role: "assistant",
-        streaming: true,
-        model: ASSISTANT_NAME,
-      });
-
-      const session = chatStore.currentSession();
-      chatStore.updateTargetSession(session, (session) => {
-        const savedUserMessage = {
-          ...userMessage,
-        };
-        session.messages = session.messages.concat([
-          savedUserMessage,
-          botMessage,
-        ]);
-      });
-
-      websocketClient.send_cmd(cmd, {
-        onFinish: () => {
-          botMessage.streaming = false;
-          ChatControllerPool.remove(session.id, botMessage.id);
-        },
-        onUpdate: (message: string) => {
-          botMessage.streaming = true;
-          botMessage.content = message;
-          chatStore.updateTargetSession(session, (session) => {
-            session.messages = session.messages.concat();
-          });
-        },
-      });
-    };
-
     return () => {
       localStorage.setItem(key, dom?.value ?? "");
     };

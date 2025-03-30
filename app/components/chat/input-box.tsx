@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Locale from "../../locales";
 import styles from "./input-box.module.scss";
 import { SendButton } from "./send-button";
@@ -48,6 +48,7 @@ export function InputBox({
 }: InputBoxProps) {
   const chatStore = useChatStore();
   const [ctx_ref, set_ctx_ref] = useState(BUILTIN_REFERENCE.INVALID);
+  const CurrentBotMsg = useRef<ChatMessage>();
   const [attachedItems, setAttachedItems] = useState<AttachmentItem[]>([]);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [designator, setDesignator] = useState<string>("");
@@ -59,41 +60,45 @@ export function InputBox({
   const isMobileScreen = useMobileScreen();
 
   const process_cmd = async (cmd: CHAT_CMD) => {
-    const userMessage: ChatMessage = createMessage({
-      role: "user",
-      content: (() => {
-        const r = get_readable_cmd(cmd.type);
-        if (r) return r;
-        return (cmd as GENERIC_CHAT_CMD).context.chat.input_text;
-      })(),
-      isMcpResponse: false,
-    });
-
-    const botMessage: ChatMessage = createMessage({
-      role: "assistant",
-      streaming: true,
-      model: ASSISTANT_NAME,
-    });
-
     const session = chatStore.currentSession();
-    chatStore.updateTargetSession(session, (session) => {
-      const savedUserMessage = {
-        ...userMessage,
-      };
-      session.messages = session.messages.concat([
-        savedUserMessage,
-        botMessage,
-      ]);
-    });
+
+    if (!cmd.triggered_by_passive_action) {
+      const botMessage: ChatMessage = createMessage({
+        role: "assistant",
+        streaming: true,
+        model: ASSISTANT_NAME,
+      });
+      CurrentBotMsg.current = botMessage;
+
+      const userMessage: ChatMessage = createMessage({
+        role: "user",
+        content: (() => {
+          const r = get_readable_cmd(cmd.type);
+          if (r) return r;
+          return (cmd as GENERIC_CHAT_CMD).context.chat.input_text;
+        })(),
+        isMcpResponse: false,
+      });
+
+      chatStore.updateTargetSession(session, (session) => {
+        const savedUserMessage = {
+          ...userMessage,
+        };
+        session.messages = session.messages.concat([
+          savedUserMessage,
+          botMessage,
+        ]);
+      });
+    }
 
     websocketClient.send_cmd(cmd, {
       onFinish: () => {
-        botMessage.streaming = false;
-        ChatControllerPool.remove(session.id, botMessage.id);
+        CurrentBotMsg.current!.streaming = false;
+        ChatControllerPool.remove(session.id, CurrentBotMsg.current!.id);
       },
       onUpdate: (message: string) => {
-        botMessage.streaming = true;
-        botMessage.content = message;
+        CurrentBotMsg.current!.streaming = true;
+        CurrentBotMsg.current!.content = message;
         chatStore.updateTargetSession(session, (session) => {
           session.messages = session.messages.concat();
         });
@@ -160,6 +165,7 @@ export function InputBox({
       global_context_uuid: chatGlobalContext.global_ctx?.uuid || undefined,
       design_global_context: chatGlobalContext.global_ctx ?? undefined,
     };
+    const triggered_by_passive_action = false;
     switch (ctx_ref) {
       case BUILTIN_REFERENCE.INVALID:
         process_cmd({
@@ -170,6 +176,7 @@ export function InputBox({
             },
           },
           ...global_ctx_ref,
+          triggered_by_passive_action,
         });
         break;
       case BUILTIN_REFERENCE.COMPONENT:
@@ -182,6 +189,7 @@ export function InputBox({
             designator,
           },
           ...global_ctx_ref,
+          triggered_by_passive_action,
         });
         break;
       case BUILTIN_REFERENCE.PROJECT:
@@ -193,6 +201,7 @@ export function InputBox({
             },
           },
           ...global_ctx_ref,
+          triggered_by_passive_action,
         });
         break;
     }

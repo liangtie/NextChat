@@ -97,11 +97,13 @@ class WebsocketClient {
         this.stream?.onmessage(ev);
       };
 
-      if (
-        cmd.design_global_context?.uuid &&
-        this.consumed_ctx_ids.has(cmd.design_global_context.uuid)
-      )
-        cmd.design_global_context = undefined;
+      // FIXME
+      // if (
+      //   cmd.design_global_context?.uuid &&
+      //   this.consumed_ctx_ids.has(cmd.design_global_context.uuid)
+      // )
+      //   cmd.design_global_context = undefined;
+
       this.socket!.send(JSON.stringify(cmd));
 
       if (cmd.design_global_context?.uuid)

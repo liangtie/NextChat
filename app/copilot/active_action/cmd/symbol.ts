@@ -1,4 +1,4 @@
-import { GENERIC_CHAT_CONTEXT, SYMBOL_CMD_CONTEXT } from "../context";
+import { SYMBOL_CMD_CONTEXT, GENERIC_CHAT_CONTEXT } from "../../context";
 import { CMD_BASE } from "./cmd_base";
 import { CMD_TYPE, SYMBOL_CMD_TYPE } from "./cmd_type";
 

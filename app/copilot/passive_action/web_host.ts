@@ -9,8 +9,8 @@ export interface WEB_HOST_INTERNAL_CMD {
   type: string;
 }
 
-export const fire_web_host_internal_cmd = (action: WEB_HOST_INTERNAL_CMD) =>
+export const fire_web_host_internal_cmd = (data: WEB_HOST_INTERNAL_CMD) =>
   fire_passive_action({
     category: PASSIVE_ACTION_CATEGORY.PA_WEB_HOST,
-    action,
+    data,
   });

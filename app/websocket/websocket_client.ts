@@ -73,7 +73,7 @@ class WebSocketStream {
           if (typeof window !== "undefined")
             fire_passive_action({
               category: PASSIVE_ACTION_CATEGORY.PA_AGENT,
-              action: res,
+              data: res,
             });
           break;
       }

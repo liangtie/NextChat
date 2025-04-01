@@ -30,6 +30,7 @@ import { websocketClient } from "@/app/websocket";
 import { useNavigate } from "react-router-dom";
 import { isEmpty } from "lodash-es";
 import { chatGlobalContext } from "./chat-global-context";
+import { highlight_symbol } from "@/app/copilot/passive_action/agent/highlight_symbol";
 
 interface InputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -270,7 +271,11 @@ export function InputBox({
         const it = item.opt;
         set_ctx_ref(it);
 
-        if (it === BUILTIN_REFERENCE.COMPONENT) setDesignator(item.name);
+        if (it === BUILTIN_REFERENCE.COMPONENT) {
+          const designator = item.name;
+          setDesignator(designator);
+          highlight_symbol(designator);
+        }
 
         const newItems = attachedItems.filter(
           (it) => it.type !== AttachmentType.CONTEXT_OPTION,
